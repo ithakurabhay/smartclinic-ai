@@ -449,7 +449,7 @@ app.post("/webhook", async (req, res) => {
         }
 
         // ===============================
-        // TOKEN NAME
+        // TOKEN NAMEgit push origin master
         // ===============================
 
         if (session.step === "WAITING_FOR_NAME") {
@@ -498,8 +498,8 @@ app.post("/webhook", async (req, res) => {
 
             const reply =
                 session.language === "en"
-                    ? `📅 Appointment request received.\n\nDate: ${date}\nDoctor: Dr. Sharma\n\nWe will confirm your appointment shortly.`
-                    : `📅 अपॉइंटमेंट रिक्वेस्ट प्राप्त हुई।\n\nतारीख: ${date}\nडॉक्टर: Dr. Sharma\n\nआपकी अपॉइंटमेंट जल्द कन्फर्म की जाएगी।`;
+                    ? `📅 Appointment request received.\n\nDate: ${date}\nDoctor: Dr. manu\n\nWe will confirm your appointment shortly.`
+                    : `📅 अपॉइंटमेंट रिक्वेस्ट प्राप्त हुई।\n\nतारीख: ${date}\nडॉक्टर: Dr. manu\n\nआपकी अपॉइंटमेंट जल्द कन्फर्म की जाएगी।`;
 
             session.step = "MENU";
 
