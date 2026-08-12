@@ -48,8 +48,7 @@ app.get("/privacy-policy", (req, res) => {
 // WhatsApp webhook verification
 app.get("/webhook", (req, res) => {
 
-    const VERIFY_TOKEN = "smartclinic_verify_123";
-
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
     const mode = req.query["hub.mode"];
     const token = req.query["hub.verify_token"];
     const challenge = req.query["hub.challenge"];
