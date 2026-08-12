@@ -61,6 +61,9 @@ const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 });
 
 // Receive WhatsApp messages
+const userSessions = {};
+let tokenNumber = 0;
+
 app.post("/webhook", async (req, res) => {
 
     console.log("WhatsApp Webhook Received:");
@@ -70,39 +73,115 @@ app.post("/webhook", async (req, res) => {
         const message =
             req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
-        if (message) {
-            const from = message.from;
-
-            console.log("Message received from:", from);
-
-            const response = await fetch(
- `https://graph.facebook.com/v26.0/${PHONE_NUMBER_ID}/messages`,
-  {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to: from,
-      type: "text",
-      text: {
-        preview_url: false,
-        body: "Hello 👋 SmartClinic AI is active! Your message has been received."
-      }
-    })
-  }
-);
-
-const result = await response.json();
-
-console.log("WhatsApp API Status:", response.status);
-console.log("WhatsApp API Result:", JSON.stringify(result, null, 2));
-
-
+        if (!message) {
+            return res.sendStatus(200);
         }
+
+        const from = message.from;
+        const text = message.text?.body?.trim() || "";
+
+        console.log("Message received from:", from);
+        console.log("Text:", text);
+
+        // Create session for new user
+        if (!userSessions[from]) {
+            userSessions[from] = {
+                step: "START",
+                name: ""
+            };
+        }
+
+        const session = userSessions[from];
+
+        let reply = "";
+
+        // STEP 1
+        if (session.step === "START") {
+            reply =
+                "Namaste 👋 SmartClinic mein token book karne ke liye 1 bhejiye.";
+            session.step = "WAITING_FOR_ONE";
+        }
+
+        // STEP 2
+        else if (session.step === "WAITING_FOR_ONE") {
+
+            if (text === "1") {
+                reply = "Apna naam bhejiye.";
+                session.step = "WAITING_FOR_NAME";
+            } else {
+                reply = "Token book karne ke liye sirf 1 bhejiye.";
+            }
+        }
+
+        // STEP 3
+        else if (session.step === "WAITING_FOR_NAME") {
+
+            session.name = text;
+
+            if (tokenNumber >= 100) {
+                reply =
+                    "Sorry 😔 Aaj ke saare 100 tokens book ho chuke hain.";
+            } else {
+                tokenNumber++;
+
+                reply =
+                    `Token booking successful ✅\n\n` +
+                    `Name: ${session.name}\n` +
+                    `Token Number: #${tokenNumber}\n\n` +
+                    `SmartClinic mein aapka token confirm hai. 🙏`;
+
+                session.step = "DONE";
+            }
+        }
+
+        // STEP 4
+        else if (session.step === "DONE") {
+
+            reply =
+                `Aapka token #${tokenNumber} already booked hai. ✅\n\n` +
+                `Naya token book karne ke liye "new" bhejiye.`;
+        }
+
+        // NEW BOOKING
+        if (text.toLowerCase() === "new") {
+
+            userSessions[from] = {
+                step: "WAITING_FOR_ONE",
+                name: ""
+            };
+
+            reply =
+                "Theek hai 👍\n\nNaya token book karne ke liye 1 bhejiye.";
+        }
+
+        const response = await fetch(
+            `https://graph.facebook.com/v26.0/${PHONE_NUMBER_ID}/messages`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    messaging_product: "whatsapp",
+                    recipient_type: "individual",
+                    to: from,
+                    type: "text",
+                    text: {
+                        preview_url: false,
+                        body: reply
+                    }
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        console.log("WhatsApp API Status:", response.status);
+        console.log(
+            "WhatsApp API Result:",
+            JSON.stringify(result, null, 2)
+        );
 
         res.sendStatus(200);
 
