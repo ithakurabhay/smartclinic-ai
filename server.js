@@ -13,6 +13,37 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 app.get("/", (req, res) => {
     res.send("SmartClinic AI Server is Running ✅");
 });
+app.get("/privacy-policy", (req, res) => {
+    res.send(`
+        <html>
+        <head>
+            <title>SmartClinic AI - Privacy Policy</title>
+        </head>
+        <body>
+            <h1>SmartClinic AI Privacy Policy</h1>
+            <p>SmartClinic AI respects your privacy.</p>
+
+            <h2>Information We Collect</h2>
+            <p>
+                We may receive your WhatsApp phone number and messages
+                necessary for token booking and appointment services.
+            </p>
+
+            <h2>How We Use Information</h2>
+            <p>
+                We use this information only to provide SmartClinic AI
+                token booking and appointment services.
+            </p>
+
+            <h2>Data Sharing</h2>
+            <p>We do not sell your personal information to third parties.</p>
+
+            <h2>Contact</h2>
+            <p>Contact the SmartClinic AI team for privacy questions.</p>
+        </body>
+        </html>
+    `);
+});
 
 // WhatsApp webhook verification
 app.get("/webhook", (req, res) => {
