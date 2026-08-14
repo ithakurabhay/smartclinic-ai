@@ -1734,65 +1734,8 @@ case "EMERGENCY_NO":
       );
   }
 }
-/* =========================================================
-   PART 2C — MESSAGE PROCESSING + WEBHOOK + SERVER START
-========================================================= */
-
-/* =========================================================
-   PROCESS INCOMING MESSAGE
-========================================================= */
-
-async function processMessage(message) {
-
-  const phone =
-    message.from;
-
-  const id =
-    message.id;
-
-  const text =
-    message.text || "";
-
-  console.log(
-    `📩 Message received from ${phone}:`,
-    id || text
-  );
-
-  let patient =
-    await getPatient(phone);
-
-  let session =
-    await getSession(phone);
-   // ===============================
-// GLOBAL MAIN MENU COMMAND
-// ===============================
-
-
-
-if (
-  userText === "hi" ||
-  userText === "hii" ||
-  userText === "hello" ||
-  userText === "hey" ||
-  userText === "main menu" ||
-  userText === "menu"
-) {
-  await setSession(
-    phone,
-    "MAIN_MENU",
-    {}
-  );
-
-  await sendMainMenu(
-    phone,
-    patient
-  );
-
-  return;
-} 
-// ===============================
-// GLOBAL MAIN MENU COMMAND
-// ===============================
+let session =
+  await getSession(phone);
 
 const userText = String(text || "").trim().toLowerCase();
 
@@ -1816,35 +1759,6 @@ if (
   );
 
   return;
-}// ===============================
-// GLOBAL MAIN MENU COMMAND
-// ===============================
-
-const userText = String(text || "").trim().toLowerCase();
-
-if (
-  userText === "hi" ||
-  userText === "hii" ||
-  userText === "hello" ||
-  userText === "hey" ||
-  userText === "main menu" ||
-  userText === "menu"
-) {
-  await setSession(
-    phone,
-    "MAIN_MENU",
-    {}
-  );
-
-  await sendMainMenu(
-    phone,
-    patient
-  );
-
-  return;
-}
-
-
   /* =====================================================
      NEW PATIENT
   ===================================================== */
