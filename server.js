@@ -569,7 +569,7 @@ async function sendMainMenu(to, patient) {
   await sendList(
     to,
 
-    t.mainMenuHeader,
+    t.mainMenuHeader(patient.name),
 
     t.mainMenuButton,
 
