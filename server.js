@@ -1763,6 +1763,86 @@ async function processMessage(message) {
 
   let session =
     await getSession(phone);
+   // ===============================
+// GLOBAL MAIN MENU COMMAND
+// ===============================
+
+const userText = String(text || "").trim().toLowerCase();
+
+if (
+  userText === "hi" ||
+  userText === "hii" ||
+  userText === "hello" ||
+  userText === "hey" ||
+  userText === "main menu" ||
+  userText === "menu"
+) {
+  await setSession(
+    phone,
+    "MAIN_MENU",
+    {}
+  );
+
+  await sendMainMenu(
+    phone,
+    patient
+  );
+
+  return;
+} 
+// ===============================
+// GLOBAL MAIN MENU COMMAND
+// ===============================
+
+const userText = String(text || "").trim().toLowerCase();
+
+if (
+  userText === "hi" ||
+  userText === "hii" ||
+  userText === "hello" ||
+  userText === "hey" ||
+  userText === "main menu" ||
+  userText === "menu"
+) {
+  await setSession(
+    phone,
+    "MAIN_MENU",
+    {}
+  );
+
+  await sendMainMenu(
+    phone,
+    patient
+  );
+
+  return;
+}// ===============================
+// GLOBAL MAIN MENU COMMAND
+// ===============================
+
+const userText = String(text || "").trim().toLowerCase();
+
+if (
+  userText === "hi" ||
+  userText === "hii" ||
+  userText === "hello" ||
+  userText === "hey" ||
+  userText === "main menu" ||
+  userText === "menu"
+) {
+  await setSession(
+    phone,
+    "MAIN_MENU",
+    {}
+  );
+
+  await sendMainMenu(
+    phone,
+    patient
+  );
+
+  return;
+}
 
 
   /* =====================================================
@@ -2094,6 +2174,7 @@ async function processMessage(message) {
 
   return;
 }
+
 
   /* =====================================================
      APPOINTMENT CONFIRMATION
