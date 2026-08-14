@@ -2014,66 +2014,86 @@ async function processMessage(message) {
      SLOT SELECTION
   ===================================================== */
 
+ if (
+  session.state ===
+  "WAIT_SLOT"
+) {
+
   if (
-    session.state ===
-    "WAIT_SLOT"
+    id &&
+    id.startsWith("SLOT_")
   ) {
 
-    if (
-      id &&
-      id.startsWith("SLOT_")
-    ) {
+    const parts =
+      id.split("_");
 
-      const parts =
-        id.split("_");
+    const encoded =
+      parts
+        .slice(2)
+        .join("_");
 
-      const encoded =
-        parts
-          .slice(2)
-          .join("_");
+    let slot = "";
 
+    try {
 
-      let slot = "";
+      slot =
+        Buffer.from(
+          encoded,
+          "base64"
+        ).toString("utf8");
 
-      try {
+    } catch (error) {
 
-        slot =
-          Buffer.from(
-            encoded,
-            "base64"
-          ).toString("utf8");
+      console.error(
+        "❌ SLOT DECODE ERROR:",
+        error
+      );
 
-      } catch {
+      slot = "";
+    }
 
-        slot =
-          text;
-      }
+    if (!slot) {
+      console.error(
+        "❌ SLOT VALUE EMPTY:",
+        id
+      );
 
-
-      if (!slot) {
-        slot = text;
-      }
-
-
-      await handleSlotSelection(
+      await sendText(
         phone,
-        slot,
+        "Sorry, this slot could not be selected. Please choose a slot again."
+      );
+
+      await sendSlotMenu(
+        phone,
+        session.temp_data?.date,
         lang
       );
 
       return;
     }
 
+    console.log(
+      "✅ SELECTED SLOT:",
+      slot
+    );
 
-    await sendSlotMenu(
+    await handleSlotSelection(
       phone,
-      session.temp_data?.date,
+      slot,
       lang
     );
 
     return;
   }
 
+  await sendSlotMenu(
+    phone,
+    session.temp_data?.date,
+    lang
+  );
+
+  return;
+}
 
   /* =====================================================
      APPOINTMENT CONFIRMATION
