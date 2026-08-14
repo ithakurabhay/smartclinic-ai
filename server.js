@@ -569,7 +569,7 @@ async function sendMainMenu(to, patient) {
   await sendList(
     to,
 
-    t.mainMenuHeader(patient.name),
+    t.mainMenuHeader,
 
     t.mainMenuButton,
 
@@ -1378,11 +1378,7 @@ async function handleSlotSelection(
   const session =
     await getSession(phone);
 
-  if (text.toLowerCase() === "main menu") {
-  await setSession(phone, "MAIN_MENU", {});
-  await sendMainMenu(phone, patient);
-  return;
-}
+  
   const date =
     session.temp_data?.date;
 
@@ -1471,6 +1467,7 @@ async function confirmAppointment(
     );
 
     await clearSession(phone);
+
     return;
   }
 
@@ -1480,15 +1477,21 @@ async function confirmAppointment(
   if (!patient) {
 
     await startRegistration(phone);
+
     return;
   }
 
-  /* Check slot availability again */
+  /* =========================
+     CHECK SLOT
+  ========================= */
 
   const availableSlots =
     await getAvailableSlots(date);
 
-  if (!availableSlots.includes(slot)) {
+  if (
+    !availableSlots ||
+    !availableSlots.includes(slot)
+  ) {
 
     await sendText(
       phone,
@@ -1503,7 +1506,9 @@ async function confirmAppointment(
     return;
   }
 
-  /* Generate token */
+  /* =========================
+     GENERATE TOKEN
+  ========================= */
 
   const token =
     await generateToken(
@@ -1511,21 +1516,23 @@ async function confirmAppointment(
       slot
     );
 
-  /* Save appointment */
+  /* =========================
+     SAVE APPOINTMENT
+  ========================= */
 
   await pool.query(
     `
     INSERT INTO appointments
-      (
-        phone,
-        patient_name,
-        appointment_date,
-        slot,
-        token_number,
-        status
-      )
+    (
+      phone,
+      patient_name,
+      appointment_date,
+      slot,
+      token_number,
+      status
+    )
     VALUES
-      ($1, $2, $3, $4, $5, 'BOOKED')
+    ($1, $2, $3, $4, $5, 'BOOKED')
     `,
     [
       phone,
@@ -1536,32 +1543,44 @@ async function confirmAppointment(
     ]
   );
 
+  /* =========================
+     CLEAR / RESET SESSION
+  ========================= */
+
   await setSession(
     phone,
     "MAIN_MENU",
     {}
   );
 
+  /* =========================
+     BOOKING CONFIRMATION
+  ========================= */
+
   const t =
     TEXTS[lang];
 
-  await sendText(
-    phone,
-
+  const confirmationMessage =
     t.appointmentBooked(
       token,
       formatDate(date),
       slot
-    )
+    );
+
+  await sendText(
+    phone,
+    confirmationMessage
   );
+
+  /* =========================
+     MAIN MENU
+  ========================= */
 
   await sendMainMenu(
     phone,
     patient
   );
 }
-
-
 /* =========================================================
    CANCEL APPOINTMENT
 ========================================================= */
@@ -1683,11 +1702,16 @@ async function handleMenuAction(
 
 case "EMERGENCY_NO":
 
-    await setSession(phone, "MAIN_MENU", {});
+    await setSession(
+      phone,
+      "MAIN_MENU",
+      {}
+    );
 
-    const patient = await getPatient(phone);
-
-    await sendMainMenu(phone, patient);
+    await sendMainMenu(
+      phone,
+      patient
+    );
 
     break;
 
@@ -1700,6 +1724,23 @@ case "EMERGENCY_NO":
       );
 
       break;
+      case "CONFIRM_YES":
+
+  await confirmAppointment(
+    phone,
+    lang
+  );
+
+  break;
+
+      case "CONFIRM_NO":
+
+  await cancelAppointment(
+    phone,
+    lang
+  );
+
+  break;
 
 
     case "CHANGE_LANGUAGE":
