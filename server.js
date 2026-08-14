@@ -2294,11 +2294,9 @@ async function startServer() {
     );
 
   } catch (error) {
-
-    console.error(
-      "❌ Failed to start server:",
-      error.message
-    );
+console.error("❌ FAILED TO START SERVER");
+console.error(error);
+console.error(error?.stack);
 
     process.exit(1);
   }
