@@ -68,8 +68,8 @@ const TEXTS = {
     registrationDone: (name) =>
       `Thank you, *${name}*!\n\nYour registration is complete ✅`,
 
-    mainMenuHeader: (name) =>
-      `Hi *${name}* 👋\n\nHow can we help you today?`,
+      mainMenuHeader: (name) =>
+  `Hi *${name}* 👋\n\nHow can we help you today?`,
 
     mainMenuButton: "📋 Open Menu",
 
@@ -163,9 +163,6 @@ const TEXTS = {
 
     registrationDone: (name) =>
       `धन्यवाद, *${name}*!\n\nआपका रजिस्ट्रेशन पूरा हो गया है ✅`,
-
-    mainMenuHeader: (name) =>
-      `नमस्ते *${name}* 👋\n\nहम आपकी किस प्रकार सहायता कर सकते हैं?`,
 
     mainMenuButton: "📋 मुख्य मेनू",
 
@@ -382,7 +379,6 @@ async function clearSession(phone) {
 /* =========================================================
    WHATSAPP SEND HELPERS
 ========================================================= */
-
 async function sendWhatsApp(payload) {
 
   if (!PHONE_NUMBER_ID || !WHATSAPP_TOKEN) {
@@ -417,6 +413,10 @@ async function sendWhatsApp(payload) {
 }
 
 
+/* =========================================================
+   TEXT MESSAGE
+========================================================= */
+
 async function sendText(to, body) {
 
   await sendWhatsApp({
@@ -424,6 +424,7 @@ async function sendText(to, body) {
     recipient_type: "individual",
     to,
     type: "text",
+
     text: {
       preview_url: false,
       body
@@ -432,6 +433,10 @@ async function sendText(to, body) {
 }
 
 
+/* =========================================================
+   BUTTON MESSAGE
+========================================================= */
+
 async function sendButtons(to, body, buttons) {
 
   await sendWhatsApp({
@@ -439,6 +444,7 @@ async function sendButtons(to, body, buttons) {
     recipient_type: "individual",
     to,
     type: "interactive",
+
     interactive: {
       type: "button",
 
@@ -447,54 +453,84 @@ async function sendButtons(to, body, buttons) {
       },
 
       action: {
-        buttons: buttons.slice(0, 3).map((button) => ({
-          type: "reply",
-          reply: {
-            id: button.id,
-            title: button.title.slice(0, 20)
-          }
-        }))
+        buttons: buttons
+          .slice(0, 3)
+          .map((button) => ({
+            type: "reply",
+
+            reply: {
+              id: button.id,
+              title: button.title.slice(0, 20)
+            }
+          }))
       }
     }
   });
 }
 
 
-async function sendList(to, body, buttonText, sections) {
+/* =========================================================
+   LIST MESSAGE
+========================================================= */
 
-  await sendWhatsApp({
+ async function sendList(to, body, buttonText, sections) {
+
+  const rows = (sections?.[0]?.rows || [])
+    .slice(0, 10)
+    .map(row => ({
+      id: String(row.id).slice(0, 200),
+      title: String(row.title || "").slice(0, 24),
+      ...(row.description
+        ? { description: String(row.description).slice(0, 72) }
+        : {})
+    }));
+
+  if (!rows.length) {
+    throw new Error("sendList: No rows available");
+  }
+
+  const payload = {
     messaging_product: "whatsapp",
     recipient_type: "individual",
-    to,
+    to: String(to),
+
     type: "interactive",
 
     interactive: {
-
       type: "list",
 
       body: {
-        text: body
+        text: String(body).slice(0, 1024)
       },
 
       action: {
-        button: buttonText.slice(0, 20),
+        button: String(buttonText || "Select").slice(0, 20),
 
-        sections: sections.map(section => ({
-          title: section.title.slice(0, 24),
+        sections: [
+          {
+            title: String(
+              sections?.[0]?.title || "SmartClinic"
+            ).slice(0, 24),
 
-          rows: section.rows.map(row => ({
-            id: row.id,
-            title: row.title.slice(0, 24),
-            description: row.description
-              ? row.description.slice(0, 72)
-              : undefined
-          }))
-        }))
+            rows
+          }
+        ]
       }
     }
-  });
-}
+  };
 
+  console.log(
+    "📤 LIST ROW COUNT:",
+    payload.interactive.action.sections[0].rows.length
+  );
+
+  console.log(
+    "📤 LIST ROWS:",
+    payload.interactive.action.sections[0].rows
+  );
+
+  await sendWhatsApp(payload);
+}
 
 /* =========================================================
    LANGUAGE MENU
@@ -667,8 +703,7 @@ const TIME_SLOTS = [
   "05:30 PM",
   "06:00 PM",
   "06:30 PM",
-  "07:00 PM",
-  "07:30 PM"
+  
 ];
 
 
@@ -1097,55 +1132,39 @@ async function handleDoctorTiming(
    EMERGENCY
 ========================================================= */
 
-async function handleEmergency(
-  phone,
-  lang
-) {
+async function handleEmergency(phone, lang) {
+  const t = TEXTS[lang] || TEXTS.en;
 
-  const patient =
-    await getPatient(phone);
+  await setSession(phone, "EMERGENCY_CONFIRM", {});
 
-  const t =
-    TEXTS[lang];
+  await sendText(
+    phone,
+    lang === "hi"
+      ? "🚨 क्या आप Emergency Booking करना चाहते हैं?"
+      : "🚨 Do you want to make an Emergency Booking?"
+  );
 
-  await pool.query(
-    `
-    INSERT INTO emergency_requests
-      (phone, patient_name, message)
-    VALUES
-      ($1, $2, $3)
-    `,
+  await sendList(
+    phone,
+    lang === "hi" ? "विकल्प चुनें" : "Choose an option",
     [
-      phone,
-      patient?.name || "Unknown",
-      "Emergency assistance requested"
+      {
+        title: "SmartClinic",
+        rows: [
+          {
+            id: "EMERGENCY_YES",
+            title: lang === "hi" ? "HA" : "YES"
+          },
+          {
+            id: "EMERGENCY_NO",
+            title: lang === "hi" ? "NAA" : "NO"
+          }
+        ]
+      }
     ]
   );
-
-  await sendText(
-    phone,
-    t.emergency
-  );
-
-  await sendText(
-    phone,
-    t.emergencyRecorded
-  );
-
-  if (patient) {
-
-    await setSession(
-      phone,
-      "MAIN_MENU",
-      {}
-    );
-
-    await sendMainMenu(
-      phone,
-      patient
-    );
-  }
 }
+  
 
 
 /* =========================================================
@@ -1359,6 +1378,11 @@ async function handleSlotSelection(
   const session =
     await getSession(phone);
 
+  if (text.toLowerCase() === "main menu") {
+  await setSession(phone, "MAIN_MENU", {});
+  await sendMainMenu(phone, patient);
+  return;
+}
   const date =
     session.temp_data?.date;
 
@@ -1643,6 +1667,29 @@ async function handleMenuAction(
       );
 
       break;
+      case "EMERGENCY_YES":
+
+    await setSession(phone, "EMERGENCY_NAME", {});
+
+    await sendText(
+        phone,
+        lang === "hi"
+            ? "बहुत बढ़िया! कृपया मरीज का *पूरा नाम* भेजें।"
+            : "Great! Please send the patient's *full name*."
+    );
+
+    break;
+
+
+case "EMERGENCY_NO":
+
+    await setSession(phone, "MAIN_MENU", {});
+
+    const patient = await getPatient(phone);
+
+    await sendMainMenu(phone, patient);
+
+    break;
 
 
     case "TOKEN_STATUS":
