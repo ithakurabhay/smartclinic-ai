@@ -1135,8 +1135,6 @@ async function handleDoctorTiming(
 async function handleEmergency(phone, lang) {
   const t = TEXTS[lang] || TEXTS.en;
 
-  await setSession(phone, "EMERGENCY_CONFIRM", {});
-
   await sendText(
     phone,
     lang === "hi"
@@ -1153,11 +1151,11 @@ async function handleEmergency(phone, lang) {
         rows: [
           {
             id: "EMERGENCY_YES",
-            title: lang === "hi" ? "HA" : "YES"
+            title: lang === "hi" ? "हाँ" : "YES"
           },
           {
             id: "EMERGENCY_NO",
-            title: lang === "hi" ? "NAA" : "NO"
+            title: lang === "hi" ? "नहीं" : "NO"
           }
         ]
       }
@@ -1693,8 +1691,8 @@ async function handleMenuAction(
     await sendText(
         phone,
         lang === "hi"
-            ? "बहुत बढ़िया! कृपया मरीज का *पूरा नाम* भेजें।"
-            : "Great! Please send the patient's *full name*."
+            ? " कृपया मरीज का *पूरा नाम* भेजें।"
+            : " Please send the patient's *full name*."
     );
 
     break;
@@ -1793,6 +1791,44 @@ async function processMessage(message) {
 
   let session =
     await getSession(phone);
+  /* ================================
+   EMERGENCY PATIENT NAME
+================================ */
+
+if (session.state === "EMERGENCY_NAME") {
+
+  const patientName = text.trim();
+
+  if (!/^[A-Za-z\s]+$/.test(patientName)) {
+
+    await sendText(
+      phone,
+      session?.temp_data?.language === "hi"
+        ? "⚠️ कृपया मरीज का सही पूरा नाम भेजें।"
+        : "⚠️ Please enter the patient's full name."
+    );
+
+    return;
+  }
+
+  await setSession(
+    phone,
+    "EMERGENCY_PHONE",
+    {
+      ...session.temp_data,
+      patient_name: patientName
+    }
+  );
+
+  await sendText(
+    phone,
+    session?.temp_data?.language === "hi"
+      ? "📱 कृपया मरीज का *10-digit phone number* भेजें।"
+      : "📱 Please send the patient's *10-digit phone number*."
+  );
+
+  return;
+}  
 
   // ===============================
   // GLOBAL MAIN MENU COMMAND
