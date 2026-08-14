@@ -388,10 +388,9 @@ async function sendWhatsApp(payload) {
   }
 
   try {
-
-    await axios.post(
-      WHATSAPP_URL,
-      payload,
+      const response = await axios.post(
+    WHATSAPP_URL,
+    payload,
       {
         headers: {
           Authorization: `Bearer ${WHATSAPP_TOKEN}`,
@@ -400,6 +399,10 @@ async function sendWhatsApp(payload) {
         timeout: 20000
       }
     );
+    console.log(
+  "✅ WhatsApp API Response:",
+  response.data
+);
 
   } catch (error) {
 
@@ -474,6 +477,13 @@ async function sendButtons(to, body, buttons) {
 ========================================================= */
 
  async function sendList(to, body, buttonText, sections) {
+
+  console.log("🚨 SENDLIST RECEIVED:", JSON.stringify({
+  to,
+  body,
+  buttonText,
+  sections
+}, null, 2));
 
   const rows = (sections?.[0]?.rows || [])
     .slice(0, 10)
@@ -834,15 +844,6 @@ app.get("/webhook", (req, res) => {
 });
 
 
-/*
-=========================================================
-PART 1 END
-=========================================================
-*/
-/* =========================================================
-   PART 2A — INCOMING MESSAGE HELPERS
-========================================================= */
-
 function getIncomingMessage(messageBody) {
 
   try {
@@ -1141,10 +1142,26 @@ async function handleEmergency(phone, lang) {
       ? "🚨 क्या आप Emergency Booking करना चाहते हैं?"
       : "🚨 Do you want to make an Emergency Booking?"
   );
+console.log("🚨 EMERGENCY SENDLIST DATA:", JSON.stringify([
+  {
+    title: "SmartClinic",
+    rows: [
+      {
+        id: "EMERGENCY_YES",
+        title: lang === "hi" ? "हाँ" : "YES"
+      },
+      {
+        id: "EMERGENCY_NO",
+        title: lang === "hi" ? "नहीं" : "NO"
+      }
+    ]
+  }
+], null, 2));
 
   await sendList(
     phone,
     lang === "hi" ? "विकल्प चुनें" : "Choose an option",
+    lang === "hi" ? "चुनें" : "Select",
     [
       {
         title: "SmartClinic",
@@ -1829,7 +1846,66 @@ if (session.state === "EMERGENCY_NAME") {
 
   return;
 }  
+// ============================================
+// EMERGENCY PATIENT PHONE
+// ============================================
 
+if (session.state === "EMERGENCY_PHONE") {
+  const patientPhone = text.replace(/\D/g, "");
+
+  if (!/^\d{10}$/.test(patientPhone)) {
+    await sendText(
+      phone,
+      session?.temp_data?.language === "hi"
+        ? "⚠️ कृपया मरीज का सही *10 अंकों का मोबाइल नंबर* भेजें।"
+        : "⚠️ Please send a valid *10-digit phone number*."
+    );
+
+    return;
+  }
+
+  await setSession(
+    phone,
+    "EMERGENCY_DETAILS",
+    {
+      ...session.temp_data,
+      patient_phone: patientPhone
+    }
+  );
+
+  await sendText(
+    phone,
+    session?.temp_data?.language === "hi"
+      ? "🚨 कृपया Emergency की जानकारी भेजें।\n\nयह जानकारी *वैकल्पिक* है।\n\nअगर जानकारी नहीं देना चाहते हैं तो *skip* लिखें।"
+      : "🚨 Please provide the emergency details.\n\nThis information is *optional*.\n\nIf you don't want to provide details, type *skip*."
+  );
+
+  return;
+}
+// ============================================
+// EMERGENCY DETAILS + FINAL CONFIRMATION
+// ============================================
+
+if (session.state === "EMERGENCY_DETAILS") {
+  const emergencyDetails =
+    text.trim().toLowerCase() === "skip"
+      ? ""
+      : text.trim();
+
+  const patientName = session?.temp_data?.patient_name || "";
+  const patientPhone = session?.temp_data?.patient_phone || "";
+
+  await sendText(
+    phone,
+    session?.temp_data?.language === "hi"
+      ? `✅ *आपकी Emergency Booking सफलतापूर्वक पूरी हो गई है।*\n\n👤 मरीज का नाम: ${patientName}\n📞 मोबाइल नंबर: ${patientPhone}\n🚨 Emergency Details: ${emergencyDetails || "प्रदान नहीं की गई"}\n\n🏥 आपका Emergency अनुरोध दर्ज हो गया है।`
+      : `✅ *Your Emergency Booking has been completed successfully.*\n\n👤 Patient Name: ${patientName}\n📞 Phone Number: ${patientPhone}\n🚨 Emergency Details: ${emergencyDetails || "Not provided"}\n\n🏥 Your emergency request has been recorded.`
+  );
+
+  await setSession(phone, "MAIN_MENU", {});
+
+  return;
+}
   // ===============================
   // GLOBAL MAIN MENU COMMAND
   // ===============================
