@@ -1767,7 +1767,7 @@ async function processMessage(message) {
 // GLOBAL MAIN MENU COMMAND
 // ===============================
 
-const userText = String(text || "").trim().toLowerCase();
+
 
 if (
   userText === "hi" ||
