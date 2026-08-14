@@ -1734,31 +1734,58 @@ case "EMERGENCY_NO":
       );
   }
 }
-let session =
-  await getSession(phone);
+async function processMessage(message) {
 
-const userText = String(text || "").trim().toLowerCase();
+  const phone = message.from;
 
-if (
-  userText === "hi" ||
-  userText === "hii" ||
-  userText === "hello" ||
-  userText === "hey" ||
-  userText === "main menu" ||
-  userText === "menu"
-) {
-  await setSession(
-    phone,
-    "MAIN_MENU",
-    {}
+  const id = message.id;
+
+  const text = message.text || "";
+
+  console.log(
+    `📩 Message received from ${phone}:`,
+    id || text
   );
 
-  await sendMainMenu(
-    phone,
-    patient
-  );
+  let patient =
+    await getPatient(phone);
 
-  return;
+  let session =
+    await getSession(phone);
+
+  // ===============================
+  // GLOBAL MAIN MENU COMMAND
+  // ===============================
+
+  const userText =
+    String(text || "").trim().toLowerCase();
+
+  if (
+    userText === "hi" ||
+    userText === "hii" ||
+    userText === "hello" ||
+    userText === "hey" ||
+    userText === "main menu" ||
+    userText === "menu"
+  ) {
+    await setSession(
+      phone,
+      "MAIN_MENU",
+      {}
+    );
+
+    await sendMainMenu(
+      phone,
+      patient
+    );
+
+    return;
+  }
+
+  // YAHAN SE BAaki processing
+  // DATE SELECTION
+  // SLOT SELECTION
+  // etc.
   /* =====================================================
      NEW PATIENT
   ===================================================== */
@@ -1884,7 +1911,7 @@ if (
     return;
   }
 
-
+  
   /* =====================================================
      EXISTING PATIENT
   ===================================================== */
