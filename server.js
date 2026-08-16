@@ -43,15 +43,26 @@ const pool = new Pool({
    TEXT DICTIONARY
 ========================================================= */
 
+/* =========================================================
+   TEXT DICTIONARY
+========================================================= */
+
 const TEXTS = {
+
+  /* =====================================================
+     ENGLISH
+  ===================================================== */
 
   en: {
 
     welcome:
       `Welcome to *${CLINIC_NAME}* 🏥\n\nPlease select your preferred language:`,
 
-    langEnglish: "🇬🇧 English",
-    langHindi: "🇮🇳 हिंदी",
+    langEnglish:
+      "🇬🇧 English",
+
+    langHindi:
+      "🇮🇳 हिंदी",
 
     askName:
       "Great! What is your *full name*?",
@@ -68,19 +79,46 @@ const TEXTS = {
     registrationDone: (name) =>
       `Thank you, *${name}*!\n\nYour registration is complete ✅`,
 
-      mainMenuHeader: (name) =>
-  `Hi *${name}* 👋\n\nHow can we help you today?`,
+    mainMenuHeader: (name) =>
+      `Hi *${name}* 👋\n\nHow can we help you today?`,
 
-    mainMenuButton: "📋 Open Menu",
+    mainMenuButton:
+      "📋 Open Menu",
 
-    book: "📅 Book Appointment",
-    timing: "👨‍⚕️ Doctor Timings",
-    emergency: "🚨 Emergency",
-    token: "🎟️ Token / Queue Status",
-    language: "🌐 Change Language",
-    details: "👤 My Details",
+    /* =================================================
+       MAIN SERVICES
+    ================================================= */
 
-    mainMenu: "🏠 Main Menu",
+    book:
+      "📅 Book Appointment",
+
+    bookToken:
+      "🎟️ Book Token",
+
+    tokenStatus:
+      "📊 Token Status",
+
+    timing:
+      "👨‍⚕️ Doctor Timings",
+
+    emergency:
+      "🚨 Emergency",
+
+    language:
+      "🌐 Change Language",
+
+    details:
+      "👤 My Details",
+
+    mainMenu:
+      "🏠 Main Menu",
+
+    /* =================================================
+       APPOINTMENT
+    ================================================= */
+
+    chooseDoctor:
+      "👨‍⚕️ Please select a doctor:",
 
     chooseDate:
       "📅 Please choose a date for your appointment:",
@@ -94,20 +132,81 @@ const TEXTS = {
     noSlots:
       "Sorry, no slots are available for this date.",
 
-    confirmAppointment: (date, slot) =>
-      `Please confirm your appointment:\n\n📅 Date: *${date}*\n🕐 Slot: *${slot}*\n👨‍⚕️ Doctor: *${DOCTOR_NAME}*`,
+    confirmAppointment: (doctor, date, slot, charge) =>
+      `Please confirm your appointment:\n\n` +
+      `👨‍⚕️ Doctor: *${doctor}*\n` +
+      `📅 Date: *${date}*\n` +
+      `🕐 Slot: *${slot}*\n` +
+      `💰 Appointment Fee: *₹${charge}*`,
 
-    confirmYes: "✅ Confirm",
-    confirmNo: "❌ Cancel",
+    confirmYes:
+      "✅ Confirm",
 
-    appointmentBooked: (token, date, slot) =>
-      `🎉 *Appointment booked successfully!*\n\n🎟️ Token Number: *${token}*\n📅 Date: *${date}*\n🕐 Slot: *${slot}*\n👨‍⚕️ Doctor: *${DOCTOR_NAME}*\n\nPlease arrive a few minutes before your appointment. 🙏`,
+    confirmNo:
+      "❌ Cancel",
+
+    appointmentBooked: (token, doctor, date, slot, charge) =>
+      `🎉 *Appointment booked successfully!*\n\n` +
+      `👨‍⚕️ Doctor: *${doctor}*\n` +
+      `🎟️ Token Number: *${token}*\n` +
+      `📅 Date: *${date}*\n` +
+      `🕐 Slot: *${slot}*\n` +
+      `💰 Appointment Fee: *₹${charge}*\n\n` +
+      `Please arrive a few minutes before your appointment. 🙏`,
 
     appointmentCancelled:
       "❌ Your appointment request was cancelled.\n\nYou can start again anytime from the Main Menu.",
 
+    /* =================================================
+       TOKEN
+    ================================================= */
+
+    chooseTokenDoctor:
+      "👨‍⚕️ Please select a doctor for your token:",
+
+    tokenBooked: (token, doctor, charge) =>
+      `🎟️ *Token booked successfully!*\n\n` +
+      `👨‍⚕️ Doctor: *${doctor}*\n` +
+      `🎟️ Your Token: *${token}*\n` +
+      `💰 Token Fee: *₹${charge}*\n\n` +
+      `You can check your queue status anytime.`,
+
+    tokenStatusTitle:
+      "🎟️ *Token Status*",
+
+    tokenStatusMessage: (
+      token,
+      activeToken,
+      patientsAhead,
+      waitMinutes,
+      estimatedTime
+    ) =>
+      `🎟️ *Token Status*\n\n` +
+      `🎫 Your Token: *${token}*\n` +
+      `🔵 Active Token: *${activeToken}*\n` +
+      `👥 Patients Ahead: *${patientsAhead}*\n` +
+      `⏱️ Estimated Waiting Time: *${waitMinutes} minutes*\n` +
+      `🕐 Estimated Turn: *${estimatedTime}*`,
+
+    noActiveToken:
+      "🎟️ You do not have any active token for today.",
+
+    tokenCompleted:
+      "✅ Your token has already been completed.",
+
+    /* =================================================
+       DOCTOR
+    ================================================= */
+
     doctorTiming:
-      `👨‍⚕️ *${DOCTOR_NAME} - Consultation Timings*\n\nMonday - Saturday\n🕙 10:00 AM - 1:00 PM\n🕔 5:00 PM - 8:00 PM\n\nSunday: Closed`,
+      `👨‍⚕️ *Doctor Timings*`,
+
+    doctorNotAvailable:
+      "Sorry, this doctor is currently unavailable.",
+
+    /* =================================================
+       EMERGENCY
+    ================================================= */
 
     emergency:
       "🚨 *Emergency Assistance*\n\nIf this is a life-threatening medical emergency, please contact your nearest hospital/emergency service immediately.\n\nDo not wait for a WhatsApp response.",
@@ -115,14 +214,28 @@ const TEXTS = {
     emergencyRecorded:
       "🚨 Your emergency request has been recorded.\n\nPlease contact the nearest emergency medical service immediately. Our staff will review your request as soon as possible.",
 
-    noToken:
-      "🎟️ You do not have any active appointment/token for today.\n\nWould you like to book an appointment?",
+    emergencyBooking:
+      "🚨 Do you want to make an Emergency Booking?",
 
-    tokenStatus: (token, date, slot, position) =>
-      `🎟️ *Your Token: ${token}*\n\n📅 Date: ${date}\n🕐 Slot: ${slot}\n👥 Patients ahead of you: ${position}`,
+    emergencyYes:
+      "✅ YES",
+
+    emergencyNo:
+      "❌ NO",
+
+    /* =================================================
+       MY DETAILS
+    ================================================= */
 
     myDetails: (name, phone, lang) =>
-      `👤 *Your Details*\n\nName: ${name}\nPhone: ${phone}\nLanguage: ${lang === "hi" ? "Hindi" : "English"}`,
+      `👤 *Your Details*\n\n` +
+      `Name: ${name}\n` +
+      `Phone: ${phone}\n` +
+      `Language: ${lang === "hi" ? "Hindi" : "English"}`,
+
+    /* =================================================
+       GENERAL
+    ================================================= */
 
     languageChanged:
       "🌐 Language changed successfully.",
@@ -138,16 +251,24 @@ const TEXTS = {
 
     no:
       "No"
+
   },
 
+
+  /* =====================================================
+     HINDI
+  ===================================================== */
 
   hi: {
 
     welcome:
       `*${CLINIC_NAME}* में आपका स्वागत है 🏥\n\nकृपया अपनी पसंदीदा भाषा चुनें:`,
 
-    langEnglish: "🇬🇧 English",
-    langHindi: "🇮🇳 हिंदी",
+    langEnglish:
+      "🇬🇧 English",
+
+    langHindi:
+      "🇮🇳 हिंदी",
 
     askName:
       "बहुत बढ़िया! कृपया अपना *पूरा नाम* भेजें।",
@@ -164,16 +285,46 @@ const TEXTS = {
     registrationDone: (name) =>
       `धन्यवाद, *${name}*!\n\nआपका रजिस्ट्रेशन पूरा हो गया है ✅`,
 
-    mainMenuButton: "📋 मुख्य मेनू",
+    mainMenuHeader: (name) =>
+      `नमस्ते *${name}* 👋\n\nआज हम आपकी कैसे मदद कर सकते हैं?`,
 
-    book: "📅 अपॉइंटमेंट बुक करें",
-    timing: "👨‍⚕️ डॉक्टर का समय",
-    emergency: "🚨 इमरजेंसी",
-    token: "🎟️ टोकन / कतार स्थिति",
-    language: "🌐 भाषा बदलें",
-    details: "👤 मेरी जानकारी",
+    mainMenuButton:
+      "📋 मुख्य मेनू",
 
-    mainMenu: "🏠 मुख्य मेनू",
+    /* =================================================
+       MAIN SERVICES
+    ================================================= */
+
+    book:
+      "📅 अपॉइंटमेंट बुक करें",
+
+    bookToken:
+      "🎟️ टोकन बुक करें",
+
+    tokenStatus:
+      "📊 टोकन स्टेटस",
+
+    timing:
+      "👨‍⚕️ डॉक्टर का समय",
+
+    emergency:
+      "🚨 इमरजेंसी",
+
+    language:
+      "🌐 भाषा बदलें",
+
+    details:
+      "👤 मेरी जानकारी",
+
+    mainMenu:
+      "🏠 मुख्य मेनू",
+
+    /* =================================================
+       APPOINTMENT
+    ================================================= */
+
+    chooseDoctor:
+      "👨‍⚕️ कृपया डॉक्टर चुनें:",
 
     chooseDate:
       "📅 कृपया अपॉइंटमेंट के लिए तारीख चुनें:",
@@ -187,20 +338,81 @@ const TEXTS = {
     noSlots:
       "क्षमा करें, इस तारीख के लिए कोई स्लॉट उपलब्ध नहीं है।",
 
-    confirmAppointment: (date, slot) =>
-      `कृपया अपना अपॉइंटमेंट कन्फर्म करें:\n\n📅 तारीख: *${date}*\n🕐 समय: *${slot}*\n👨‍⚕️ डॉक्टर: *${DOCTOR_NAME}*`,
+    confirmAppointment: (doctor, date, slot, charge) =>
+      `कृपया अपना अपॉइंटमेंट कन्फर्म करें:\n\n` +
+      `👨‍⚕️ डॉक्टर: *${doctor}*\n` +
+      `📅 तारीख: *${date}*\n` +
+      `🕐 समय: *${slot}*\n` +
+      `💰 अपॉइंटमेंट फीस: *₹${charge}*`,
 
-    confirmYes: "✅ कन्फर्म",
-    confirmNo: "❌ कैंसल",
+    confirmYes:
+      "✅ कन्फर्म",
 
-    appointmentBooked: (token, date, slot) =>
-      `🎉 *अपॉइंटमेंट सफलतापूर्वक बुक हो गया!*\n\n🎟️ टोकन नंबर: *${token}*\n📅 तारीख: *${date}*\n🕐 समय: *${slot}*\n👨‍⚕️ डॉक्टर: *${DOCTOR_NAME}*\n\nकृपया अपॉइंटमेंट से कुछ मिनट पहले पहुंचें। 🙏`,
+    confirmNo:
+      "❌ कैंसल",
+
+    appointmentBooked: (token, doctor, date, slot, charge) =>
+      `🎉 *अपॉइंटमेंट सफलतापूर्वक बुक हो गया!*\n\n` +
+      `👨‍⚕️ डॉक्टर: *${doctor}*\n` +
+      `🎟️ टोकन नंबर: *${token}*\n` +
+      `📅 तारीख: *${date}*\n` +
+      `🕐 समय: *${slot}*\n` +
+      `💰 अपॉइंटमेंट फीस: *₹${charge}*\n\n` +
+      `कृपया अपॉइंटमेंट से कुछ मिनट पहले पहुंचें। 🙏`,
 
     appointmentCancelled:
       "❌ आपका अपॉइंटमेंट कैंसल कर दिया गया है।\n\nआप मुख्य मेनू से दोबारा शुरू कर सकते हैं।",
 
+    /* =================================================
+       TOKEN
+    ================================================= */
+
+    chooseTokenDoctor:
+      "👨‍⚕️ कृपया टोकन के लिए डॉक्टर चुनें:",
+
+    tokenBooked: (token, doctor, charge) =>
+      `🎟️ *टोकन सफलतापूर्वक बुक हो गया!*\n\n` +
+      `👨‍⚕️ डॉक्टर: *${doctor}*\n` +
+      `🎟️ आपका टोकन: *${token}*\n` +
+      `💰 टोकन फीस: *₹${charge}*\n\n` +
+      `आप कभी भी अपना टोकन स्टेटस देख सकते हैं।`,
+
+    tokenStatusTitle:
+      "🎟️ *टोकन स्टेटस*",
+
+    tokenStatusMessage: (
+      token,
+      activeToken,
+      patientsAhead,
+      waitMinutes,
+      estimatedTime
+    ) =>
+      `🎟️ *टोकन स्टेटस*\n\n` +
+      `🎫 आपका टोकन: *${token}*\n` +
+      `🔵 एक्टिव टोकन: *${activeToken}*\n` +
+      `👥 आपसे आगे मरीज: *${patientsAhead}*\n` +
+      `⏱️ अनुमानित प्रतीक्षा समय: *${waitMinutes} मिनट*\n` +
+      `🕐 अनुमानित टर्न: *${estimatedTime}*`,
+
+    noActiveToken:
+      "🎟️ आज के लिए आपका कोई एक्टिव टोकन नहीं है।",
+
+    tokenCompleted:
+      "✅ आपका टोकन पूरा हो चुका है।",
+
+    /* =================================================
+       DOCTOR
+    ================================================= */
+
     doctorTiming:
-      `👨‍⚕️ *${DOCTOR_NAME} - डॉक्टर का समय*\n\nसोमवार - शनिवार\n🕙 सुबह 10:00 - दोपहर 1:00\n🕔 शाम 5:00 - रात 8:00\n\nरविवार: बंद`,
+      `👨‍⚕️ *डॉक्टर का समय*`,
+
+    doctorNotAvailable:
+      "क्षमा करें, यह डॉक्टर अभी उपलब्ध नहीं है।",
+
+    /* =================================================
+       EMERGENCY
+    ================================================= */
 
     emergency:
       "🚨 *इमरजेंसी सहायता*\n\nअगर यह जानलेवा मेडिकल इमरजेंसी है, तो तुरंत नजदीकी अस्पताल या इमरजेंसी सेवा से संपर्क करें।\n\nWhatsApp जवाब का इंतजार न करें।",
@@ -208,14 +420,28 @@ const TEXTS = {
     emergencyRecorded:
       "🚨 आपकी इमरजेंसी रिक्वेस्ट रिकॉर्ड कर ली गई है।\n\nकृपया तुरंत नजदीकी इमरजेंसी मेडिकल सेवा से संपर्क करें। हमारी टीम आपकी रिक्वेस्ट जल्द से जल्द देखेगी।",
 
-    noToken:
-      "🎟️ आज के लिए आपका कोई एक्टिव अपॉइंटमेंट/टोकन नहीं है।\n\nक्या आप अपॉइंटमेंट बुक करना चाहते हैं?",
+    emergencyBooking:
+      "🚨 क्या आप Emergency Booking करना चाहते हैं?",
 
-    tokenStatus: (token, date, slot, position) =>
-      `🎟️ *आपका टोकन: ${token}*\n\n📅 तारीख: ${date}\n🕐 समय: ${slot}\n👥 आपसे आगे मरीज: ${position}`,
+    emergencyYes:
+      "✅ हाँ",
+
+    emergencyNo:
+      "❌ नहीं",
+
+    /* =================================================
+       MY DETAILS
+    ================================================= */
 
     myDetails: (name, phone, lang) =>
-      `👤 *आपकी जानकारी*\n\nनाम: ${name}\nफोन: ${phone}\nभाषा: ${lang === "hi" ? "हिंदी" : "English"}`,
+      `👤 *आपकी जानकारी*\n\n` +
+      `नाम: ${name}\n` +
+      `फोन: ${phone}\n` +
+      `भाषा: ${lang === "hi" ? "हिंदी" : "English"}`,
+
+    /* =================================================
+       GENERAL
+    ================================================= */
 
     languageChanged:
       "🌐 भाषा सफलतापूर्वक बदल दी गई है।",
@@ -231,16 +457,19 @@ const TEXTS = {
 
     no:
       "नहीं"
+
   }
 
 };
 
-
 /* =========================================================
    DATABASE INITIALIZATION
 ========================================================= */
-
 async function initDB() {
+
+  /* =====================================================
+     EXISTING TABLES — DO NOT DELETE
+  ===================================================== */
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS patients (
@@ -264,15 +493,26 @@ async function initDB() {
   `);
 
 
+  /* =====================================================
+     APPOINTMENTS
+  ===================================================== */
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS appointments (
       id SERIAL PRIMARY KEY,
+
       phone VARCHAR(30) NOT NULL,
+
       patient_name VARCHAR(150) NOT NULL,
+
       appointment_date DATE NOT NULL,
+
       slot VARCHAR(50) NOT NULL,
+
       token_number INTEGER NOT NULL,
+
       status VARCHAR(30) DEFAULT 'BOOKED',
+
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
       UNIQUE(appointment_date, slot, token_number)
@@ -280,18 +520,275 @@ async function initDB() {
   `);
 
 
+  /* =====================================================
+     EMERGENCY REQUESTS
+  ===================================================== */
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS emergency_requests (
       id SERIAL PRIMARY KEY,
+
       phone VARCHAR(30) NOT NULL,
+
       patient_name VARCHAR(150),
+
       message TEXT,
+
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
 
-  console.log("✅ Database schema verified/created successfully.");
+  /* =====================================================
+     HOSPITALS
+     Super Admin manages hospitals
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS hospitals (
+      id SERIAL PRIMARY KEY,
+
+      hospital_name VARCHAR(200) NOT NULL,
+
+      hospital_code VARCHAR(100) UNIQUE NOT NULL,
+
+      phone VARCHAR(30),
+
+      email VARCHAR(150),
+
+      address TEXT,
+
+      city VARCHAR(100),
+
+      state VARCHAR(100),
+
+      is_active BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     DOCTORS
+     Each doctor belongs to one hospital
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS doctors (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      doctor_name VARCHAR(200) NOT NULL,
+
+      specialization VARCHAR(150),
+
+      /* Doctor-wise charges */
+
+      appointment_charge NUMERIC(10,2) DEFAULT 0,
+
+      token_charge NUMERIC(10,2) DEFAULT 0,
+
+      emergency_charge NUMERIC(10,2) DEFAULT 0,
+
+      /* Doctor-wise service availability */
+
+      appointment_enabled BOOLEAN DEFAULT TRUE,
+
+      token_enabled BOOLEAN DEFAULT TRUE,
+
+      emergency_enabled BOOLEAN DEFAULT TRUE,
+
+      /* Average time required for one patient */
+
+      average_consultation_minutes INTEGER DEFAULT 5,
+
+      /* Doctor status */
+
+      is_active BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     HOSPITAL SERVICES
+     Super Admin controls which services hospital gets
+  ===================================================== */
+/* =====================================================
+   HOSPITAL SERVICES
+   Super Admin controls which services hospital gets
+   Hospital Admin can manage payment availability
+===================================================== */
+
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS hospital_services (
+    id SERIAL PRIMARY KEY,
+
+    hospital_id INTEGER UNIQUE NOT NULL
+      REFERENCES hospitals(id)
+      ON DELETE CASCADE,
+
+    /* Main services */
+
+    appointment_enabled BOOLEAN DEFAULT TRUE,
+
+    token_enabled BOOLEAN DEFAULT TRUE,
+
+    emergency_enabled BOOLEAN DEFAULT TRUE,
+
+    /* Payment methods */
+
+    cash_payment_enabled BOOLEAN DEFAULT TRUE,
+
+    online_payment_enabled BOOLEAN DEFAULT TRUE,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+/* =====================================================
+   HOSPITAL SERVICES MIGRATION
+   Adds new payment controls to existing hospitals
+===================================================== */
+
+await pool.query(`
+  ALTER TABLE hospital_services
+  ADD COLUMN IF NOT EXISTS cash_payment_enabled BOOLEAN DEFAULT TRUE;
+`);
+
+await pool.query(`
+  ALTER TABLE hospital_services
+  ADD COLUMN IF NOT EXISTS online_payment_enabled BOOLEAN DEFAULT TRUE;
+`);
+  /* =====================================================
+     HOSPITAL ADMINS
+     Super Admin creates hospital admin login
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS hospital_admins (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      name VARCHAR(150) NOT NULL,
+
+      email VARCHAR(150) UNIQUE NOT NULL,
+
+      password_hash TEXT NOT NULL,
+
+      is_active BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     TOKENS
+     Normal OPD token system
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tokens (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      doctor_id INTEGER NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+
+      phone VARCHAR(30) NOT NULL,
+
+      patient_name VARCHAR(150) NOT NULL,
+
+      token_number INTEGER NOT NULL,
+
+      token_date DATE NOT NULL,
+
+      status VARCHAR(30) DEFAULT 'WAITING',
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      UNIQUE(hospital_id, doctor_id, token_date, token_number)
+    );
+  `);
+
+
+  /* =====================================================
+     PAYMENTS
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      doctor_id INTEGER
+        REFERENCES doctors(id)
+        ON DELETE SET NULL,
+
+      phone VARCHAR(30) NOT NULL,
+
+      service_type VARCHAR(30) NOT NULL,
+
+      amount NUMERIC(10,2) NOT NULL DEFAULT 0,
+
+      payment_method VARCHAR(30) NOT NULL,
+
+      payment_status VARCHAR(30) DEFAULT 'PENDING',
+
+      transaction_id VARCHAR(200),
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     SUCCESS LOG
+  ===================================================== */
+
+  console.log("✅ Database schema verified successfully.");
+
+  console.log("🏥 Hospitals table ready.");
+
+  console.log("👨‍⚕️ Doctors table ready.");
+
+  console.log("🎟️ Token system ready.");
+
+  console.log("📅 Appointment system ready.");
+
+  console.log("🚨 Emergency system ready.");
+
+  console.log("💰 Payment system ready.");
+
+  console.log("💵 Cash / 🌐 Online payment settings ready.");
+
+  console.log("👑 Hospital Admin system ready.");
+
 }
 
 
@@ -374,7 +871,306 @@ async function clearSession(phone) {
     [phone]
   );
 }
+/* =========================================================
+   HOSPITAL MANAGEMENT HELPERS
+========================================================= */
 
+async function createHospital({
+  hospitalName,
+  hospitalCode,
+  phone,
+  email,
+  address,
+  city,
+  state
+}) {
+
+  const result = await pool.query(
+    `
+    INSERT INTO hospitals
+    (
+      hospital_name,
+      hospital_code,
+      phone,
+      email,
+      address,
+      city,
+      state
+    )
+    VALUES ($1,$2,$3,$4,$5,$6,$7)
+    RETURNING *
+    `,
+    [
+      hospitalName,
+      hospitalCode,
+      phone || null,
+      email || null,
+      address || null,
+      city || null,
+      state || null
+    ]
+  );
+
+  const hospital = result.rows[0];
+
+  /* Create default services automatically */
+
+  await pool.query(
+    `
+    INSERT INTO hospital_services
+    (
+      hospital_id,
+      appointment_enabled,
+      token_enabled,
+      emergency_enabled,
+      cash_payment_enabled,
+      online_payment_enabled
+    )
+    VALUES ($1, TRUE, TRUE, TRUE, TRUE, TRUE)
+    ON CONFLICT (hospital_id)
+    DO NOTHING
+    `,
+    [hospital.id]
+  );
+
+  return hospital;
+}
+
+
+async function getHospitalById(hospitalId) {
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM hospitals
+    WHERE id = $1
+    `,
+    [hospitalId]
+  );
+
+  return result.rows[0] || null;
+}
+
+
+async function getHospitalByCode(hospitalCode) {
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM hospitals
+    WHERE hospital_code = $1
+    `,
+    [hospitalCode]
+  );
+
+  return result.rows[0] || null;
+}
+
+
+async function getAllHospitals() {
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM hospitals
+    ORDER BY id DESC
+    `
+  );
+
+  return result.rows;
+}
+
+
+/* =========================================================
+   HOSPITAL SERVICE SETTINGS
+========================================================= */
+
+async function getHospitalServices(hospitalId) {
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM hospital_services
+    WHERE hospital_id = $1
+    `,
+    [hospitalId]
+  );
+
+  return result.rows[0] || null;
+}
+
+
+async function updateHospitalServices(
+  hospitalId,
+  {
+    appointmentEnabled,
+    tokenEnabled,
+    emergencyEnabled,
+    cashPaymentEnabled,
+    onlinePaymentEnabled
+  }
+) {
+
+  const result = await pool.query(
+    `
+    UPDATE hospital_services
+    SET
+      appointment_enabled = $2,
+      token_enabled = $3,
+      emergency_enabled = $4,
+      cash_payment_enabled = $5,
+      online_payment_enabled = $6,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE hospital_id = $1
+    RETURNING *
+    `,
+    [
+      hospitalId,
+      appointmentEnabled,
+      tokenEnabled,
+      emergencyEnabled,
+      cashPaymentEnabled,
+      onlinePaymentEnabled
+    ]
+  );
+
+  return result.rows[0] || null;
+}
+
+
+/* =========================================================
+   DOCTOR MANAGEMENT HELPERS
+========================================================= */
+
+async function createDoctor({
+  hospitalId,
+  doctorName,
+  specialization,
+  appointmentCharge,
+  tokenCharge,
+  emergencyCharge,
+  appointmentEnabled,
+  tokenEnabled,
+  emergencyEnabled,
+  averageConsultationMinutes
+}) {
+
+  const result = await pool.query(
+    `
+    INSERT INTO doctors
+    (
+      hospital_id,
+      doctor_name,
+      specialization,
+      appointment_charge,
+      token_charge,
+      emergency_charge,
+      appointment_enabled,
+      token_enabled,
+      emergency_enabled,
+      average_consultation_minutes
+    )
+    VALUES
+    ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+    RETURNING *
+    `,
+    [
+      hospitalId,
+      doctorName,
+      specialization || null,
+      Number(appointmentCharge || 0),
+      Number(tokenCharge || 0),
+      Number(emergencyCharge || 0),
+      appointmentEnabled ?? true,
+      tokenEnabled ?? true,
+      emergencyEnabled ?? true,
+      Number(averageConsultationMinutes || 5)
+    ]
+  );
+
+  return result.rows[0];
+}
+
+
+async function getDoctorById(doctorId) {
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM doctors
+    WHERE id = $1
+    `,
+    [doctorId]
+  );
+
+  return result.rows[0] || null;
+}
+
+
+async function getDoctorsByHospital(hospitalId) {
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM doctors
+    WHERE hospital_id = $1
+    ORDER BY id DESC
+    `,
+    [hospitalId]
+  );
+
+  return result.rows;
+}
+
+
+async function updateDoctor(
+  doctorId,
+  {
+    doctorName,
+    specialization,
+    appointmentCharge,
+    tokenCharge,
+    emergencyCharge,
+    appointmentEnabled,
+    tokenEnabled,
+    emergencyEnabled,
+    averageConsultationMinutes
+  }
+) {
+
+  const result = await pool.query(
+    `
+    UPDATE doctors
+    SET
+      doctor_name = $2,
+      specialization = $3,
+      appointment_charge = $4,
+      token_charge = $5,
+      emergency_charge = $6,
+      appointment_enabled = $7,
+      token_enabled = $8,
+      emergency_enabled = $9,
+      average_consultation_minutes = $10,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = $1
+    RETURNING *
+    `,
+    [
+      doctorId,
+      doctorName,
+      specialization || null,
+      Number(appointmentCharge || 0),
+      Number(tokenCharge || 0),
+      Number(emergencyCharge || 0),
+      appointmentEnabled ?? true,
+      tokenEnabled ?? true,
+      emergencyEnabled ?? true,
+      Number(averageConsultationMinutes || 5)
+    ]
+  );
+
+  return result.rows[0] || null;
+}
 
 /* =========================================================
    WHATSAPP SEND HELPERS
