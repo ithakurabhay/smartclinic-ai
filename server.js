@@ -969,16 +969,35 @@ async function sendButtons(to, body, buttons) {
   sections
 }, null, 2));
 
-  const rows = (sections?.[0]?.rows || [])
-    .slice(0, 10)
-    .map(row => ({
-      id: String(row.id).slice(0, 200),
-      title: String(row.title || "").slice(0, 24),
-      ...(row.description
-        ? { description: String(row.description).slice(0, 72) }
-        : {})
-    }));
+ const sourceRows = sections?.[0]?.rows || [];
 
+const rows = sourceRows
+  .slice(0, 10)
+  .map((row, index) => {
+
+    const id = String(
+      row?.id || ""
+    ).trim();
+
+    const title = String(
+      row?.title || `Option ${index + 1}`
+    ).trim();
+
+    return {
+      id: id.slice(0, 200),
+      title: title.slice(0, 24),
+
+      ...(row?.description
+        ? {
+            description: String(
+              row.description
+            ).slice(0, 72)
+          }
+        : {})
+    };
+
+  })
+  .filter(row => row.id && row.title);
   if (!rows.length) {
     throw new Error("sendList: No rows available");
   }
@@ -1089,8 +1108,8 @@ async function sendMainMenu(to, patient) {
           },
 
           {
-            id: "TOKEN_STATUS",
-            title: t.token
+             id: "TOKEN_STATUS",
+             title: t.token || "🎟️ Token / Queue Status"
           },
 
           {
