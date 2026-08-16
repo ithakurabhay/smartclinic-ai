@@ -95,8 +95,8 @@ const TEXTS = {
     bookToken:
       "🎟️ Book Token",
 
-    tokenStatus:
-      "📊 Token Status",
+    tokenStatus: (token, date, slot, position) =>
+  `📊 *Token Status*\n\n🎟️ Token: *${token}*\n📅 Date: *${date}*\n🕐 Slot: *${slot}*\n👥 Your Position: *${position}*`,
 
     timing:
       "👨‍⚕️ Doctor Timings",
@@ -301,8 +301,8 @@ const TEXTS = {
     bookToken:
       "🎟️ टोकन बुक करें",
 
-    tokenStatus:
-      "📊 टोकन स्टेटस",
+   tokenStatus: (token, date, slot, position) =>
+  `📊 *टोकन स्थिति*\n\n🎟️ टोकन: *${token}*\n📅 तारीख: *${date}*\n🕐 स्लॉट: *${slot}*\n👥 आपकी स्थिति: *${position}*`,
 
     timing:
       "👨‍⚕️ डॉक्टर का समय",
