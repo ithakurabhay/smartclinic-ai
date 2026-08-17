@@ -1519,20 +1519,130 @@ async function startTokenBooking(phone, lang) {
 
   const t =
     TEXTS[lang] || TEXTS.en;
+     /* =========================================================
+   START TOKEN BOOKING
+========================================================= */
 
-  const hospitalId =
-    process.env.DEFAULT_HOSPITAL_ID;
+async function startTokenBooking(phone, lang) {
 
-  if (!hospitalId) {
+  const t =
+    TEXTS[lang] || TEXTS.en;
+
+  /* =====================================================
+     GET HOSPITAL FROM WHATSAPP CONNECTION
+  ===================================================== */
+
+  const hospitalResult =
+    await pool.query(
+      `
+      SELECT hospital_id
+      FROM whatsapp_connections
+      WHERE phone_number_id = $1
+        AND is_connected = TRUE
+        AND is_active = TRUE
+      LIMIT 1
+      `,
+      [PHONE_NUMBER_ID]
+    );
+
+  if (!hospitalResult.rows.length) {
 
     await sendText(
       phone,
-      "⚠️ Hospital configuration is missing."
+      "⚠️ Hospital WhatsApp connection is not configured."
     );
 
     return;
   }
 
+  const hospitalId =
+    hospitalResult.rows[0].hospital_id;
+
+
+  /* =====================================================
+     GET AVAILABLE DOCTORS
+  ===================================================== */
+
+  const result =
+    await pool.query(
+      `
+      SELECT
+        id,
+        doctor_name,
+        average_consultation_minutes
+      FROM doctors
+      WHERE hospital_id = $1
+        AND COALESCE(is_on_duty, FALSE) = TRUE
+      ORDER BY id
+      `,
+      [hospitalId]
+    );
+
+
+  /* =====================================================
+     NO DOCTOR AVAILABLE
+  ===================================================== */
+
+  if (!result.rows.length) {
+
+    await sendText(
+      phone,
+      t.doctorNotAvailable
+    );
+
+    return;
+  }
+
+
+  /* =====================================================
+     CREATE DOCTOR LIST
+  ===================================================== */
+
+  const rows =
+    result.rows.map((doctor) => ({
+      id: `TOKEN_DOCTOR_${doctor.id}`,
+      title: doctor.doctor_name
+    }));
+
+
+  /* =====================================================
+     SAVE TOKEN BOOKING SESSION
+  ===================================================== */
+
+  await setSession(
+    phone,
+    "WAIT_TOKEN_DOCTOR",
+    {
+      hospital_id: Number(hospitalId)
+    }
+  );
+
+
+  /* =====================================================
+     SEND DOCTOR MENU
+  ===================================================== */
+
+  await sendList(
+    phone,
+
+    t.chooseTokenDoctor,
+
+    lang === "hi"
+      ? "डॉक्टर चुनें"
+      : "Select Doctor",
+
+    [
+      {
+        title:
+          lang === "hi"
+            ? "उपलब्ध डॉक्टर"
+            : "Available Doctors",
+
+        rows
+      }
+    ]
+  );
+}
   const result =
     await pool.query(
       `
