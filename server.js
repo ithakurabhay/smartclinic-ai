@@ -668,6 +668,7 @@ updated_at
 TIMESTAMP
 DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE IF NOT EXISTS smartclinic_plans (
 id SERIAL PRIMARY KEY,
 plan_name
