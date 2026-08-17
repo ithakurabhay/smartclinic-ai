@@ -348,400 +348,303 @@ hindi:
 };
 /* =========================================================
 DATABASE INITIALIZATION
-========================================================= */
 async function initDB() {
-await pool.query(`
-CREATE TABLE IF NOT EXISTS hospitals (
-id SERIAL PRIMARY KEY,
-hospital_name
-VARCHAR(200)
-NOT NULL,
-hospital_code
-VARCHAR(100)
-UNIQUE
-NOT NULL,
-phone
-VARCHAR(30),
-email
-VARCHAR(150),
-address
-TEXT,
-city
-VARCHAR(100),
-state
-VARCHAR(100),
-is_active
-BOOLEAN
-DEFAULT TRUE,
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS patients (
-id SERIAL PRIMARY KEY,
-phone
-VARCHAR(30)
-UNIQUE
-NOT NULL,
-name
-VARCHAR(150)
-NOT NULL,
-language
-VARCHAR(5)
-DEFAULT 'en',
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS sessions (
-phone
-VARCHAR(30)
-PRIMARY KEY,
-state
-VARCHAR(60)
-DEFAULT 'START',
-temp_data
-JSONB
-DEFAULT '{}'::jsonb,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS doctors (
-id SERIAL PRIMARY KEY,
-hospital_id
-INTEGER
-NOT NULL
-REFERENCES hospitals(id)
-ON DELETE CASCADE,
-doctor_name
-VARCHAR(200)
-NOT NULL,
-specialization
-VARCHAR(150),
-average_consultation_minutes
-INTEGER
-DEFAULT 5,
-is_on_duty
-BOOLEAN
-DEFAULT FALSE,
-is_active
-BOOLEAN
-DEFAULT TRUE,
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS doctor_schedules (
-id SERIAL PRIMARY KEY,
-doctor_id
-INTEGER
-NOT NULL
-REFERENCES doctors(id)
-ON DELETE CASCADE,
-day_of_week
-INTEGER
-NOT NULL
-CHECK (day_of_week BETWEEN 0 AND 6),
-is_working
-BOOLEAN
-DEFAULT TRUE,
-start_time
-TIME,
-end_time
-TIME,
-break_start_time
-TIME,
-break_end_time
-TIME,
-appointment_enabled
-BOOLEAN
-DEFAULT TRUE,
-token_enabled
-BOOLEAN
-DEFAULT TRUE,
-emergency_enabled
-BOOLEAN
-DEFAULT TRUE,
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-UNIQUE (
-doctor_id,
-day_of_week
-)
-);
-CREATE TABLE IF NOT EXISTS appointments (
-id SERIAL PRIMARY KEY,
-hospital_id
-INTEGER
-NOT NULL
-REFERENCES hospitals(id)
-ON DELETE CASCADE,
-doctor_id
-INTEGER
-NOT NULL
-REFERENCES doctors(id)
-ON DELETE CASCADE,
-phone
-VARCHAR(30)
-NOT NULL,
-patient_name
-VARCHAR(150)
-NOT NULL,
-appointment_date
-DATE
-NOT NULL,
-slot
-VARCHAR(50)
-NOT NULL,
-token_number
-INTEGER
-NOT NULL,
-status
-VARCHAR(30)
-DEFAULT 'BOOKED',
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-UNIQUE (
-hospital_id,
-doctor_id,
-appointment_date,
-slot,
-token_number
-)
-);
-CREATE TABLE IF NOT EXISTS token_queue (
-id BIGSERIAL PRIMARY KEY,
-hospital_id
-INTEGER
-NOT NULL
-REFERENCES hospitals(id)
-ON DELETE CASCADE,
-doctor_id
-INTEGER
-NOT NULL
-REFERENCES doctors(id)
-ON DELETE CASCADE,
-patient_id
-INTEGER
-REFERENCES patients(id)
-ON DELETE SET NULL,
-patient_phone
-VARCHAR(30),
-patient_name
-VARCHAR(150),
-token_date
-DATE
-NOT NULL,
-token_number
-INTEGER
-NOT NULL,
-source
-VARCHAR(20)
-NOT NULL
-CHECK (
-source IN (
-'ONLINE',
-'OFFLINE'
-)
-),
-status
-VARCHAR(30)
-DEFAULT 'WAITING'
-CHECK (
-status IN (
-'WAITING',
-'CALLED',
-'COMPLETED',
-'CANCELLED'
-)
-),
-issued_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-called_at
-TIMESTAMP,
-completed_at
-TIMESTAMP,
-cancelled_at
-TIMESTAMP,
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-UNIQUE (
-hospital_id,
-doctor_id,
-token_date,
-token_number
-)
-);
-CREATE INDEX IF NOT EXISTS
-idx_token_queue_doctor_date
-ON token_queue (
-hospital_id,
-doctor_id,
-token_date
-);
-CREATE INDEX IF NOT EXISTS
-idx_token_queue_patient
-ON token_queue (
-patient_phone,
-token_date
-);
-CREATE TABLE IF NOT EXISTS emergency_requests (
-id SERIAL PRIMARY KEY,
-hospital_id
-INTEGER
-REFERENCES hospitals(id)
-ON DELETE SET NULL,
-phone
-VARCHAR(30)
-NOT NULL,
-patient_name
-VARCHAR(150),
-patient_phone
-VARCHAR(30),
-message
-TEXT,
-status
-VARCHAR(30)
-DEFAULT 'OPEN',
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS whatsapp_connections (
-id SERIAL PRIMARY KEY,
-hospital_id
-INTEGER
-UNIQUE
-NOT NULL
-REFERENCES hospitals(id)
-ON DELETE CASCADE,
-waba_id
-VARCHAR(150),
-phone_number_id
-VARCHAR(150)
-UNIQUE
-NOT NULL,
-business_phone_number
-VARCHAR(30),
-display_name
-VARCHAR(200),
-access_token
-TEXT
-NOT NULL,
-verify_token
-VARCHAR(200),
-graph_version
-VARCHAR(30)
-DEFAULT 'v23.0',
-is_connected
-BOOLEAN
-DEFAULT FALSE,
-is_active
-BOOLEAN
-DEFAULT TRUE,
-last_verified_at
-TIMESTAMP,
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
 
-CREATE TABLE IF NOT EXISTS smartclinic_plans (
-id SERIAL PRIMARY KEY,
-plan_name
-VARCHAR(100)
-UNIQUE
-NOT NULL,
-price
-NUMERIC(10,2)
-DEFAULT 0,
-billing_cycle
-VARCHAR(30)
-DEFAULT 'MONTHLY',
-is_active
-BOOLEAN
-DEFAULT TRUE,
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS hospital_subscriptions (
-id SERIAL PRIMARY KEY,
-hospital_id
-INTEGER
-UNIQUE
-NOT NULL
-REFERENCES hospitals(id)
-ON DELETE CASCADE,
-plan_id
-INTEGER
-REFERENCES smartclinic_plans(id)
-ON DELETE SET NULL,
-status
-VARCHAR(30)
-DEFAULT 'FREE',
-starts_at
-TIMESTAMP,
-expires_at
-TIMESTAMP,
-payment_reference
-VARCHAR(200),
-created_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP,
-updated_at
-TIMESTAMP
-DEFAULT CURRENT_TIMESTAMP
-);
-`);
-await pool.query(`
-INSERT INTO smartclinic_plans
-(
-plan_name,
-price,
-billing_cycle
-)
-VALUES
-(
-'FREE',
-0,
-'MONTHLY'
-)
-ON CONFLICT (
-plan_name
-)
-DO NOTHING
-`);
-console.log(
-"■ SmartClinic database initialized"
-);
-}
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS hospitals (
+      id SERIAL PRIMARY KEY,
+      hospital_name VARCHAR(200) NOT NULL,
+      hospital_code VARCHAR(100) UNIQUE NOT NULL,
+      phone VARCHAR(30),
+      email VARCHAR(150),
+      address TEXT,
+      city VARCHAR(100),
+      state VARCHAR(100),
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS patients (
+      id SERIAL PRIMARY KEY,
+      phone VARCHAR(30) UNIQUE NOT NULL,
+      name VARCHAR(150) NOT NULL,
+      language VARCHAR(5) DEFAULT 'en',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      phone VARCHAR(30) PRIMARY KEY,
+      state VARCHAR(60) DEFAULT 'START',
+      temp_data JSONB DEFAULT '{}'::jsonb,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS doctors (
+      id SERIAL PRIMARY KEY,
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+      doctor_name VARCHAR(200) NOT NULL,
+      specialization VARCHAR(150),
+      average_consultation_minutes INTEGER DEFAULT 5,
+      is_on_duty BOOLEAN DEFAULT FALSE,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS doctor_schedules (
+      id SERIAL PRIMARY KEY,
+      doctor_id INTEGER NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+      day_of_week INTEGER NOT NULL
+        CHECK (day_of_week BETWEEN 0 AND 6),
+      is_working BOOLEAN DEFAULT TRUE,
+      start_time TIME,
+      end_time TIME,
+      break_start_time TIME,
+      break_end_time TIME,
+      appointment_enabled BOOLEAN DEFAULT TRUE,
+      token_enabled BOOLEAN DEFAULT TRUE,
+      emergency_enabled BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (
+        doctor_id,
+        day_of_week
+      )
+    );
+
+    CREATE TABLE IF NOT EXISTS appointments (
+      id SERIAL PRIMARY KEY,
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+      doctor_id INTEGER NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+      phone VARCHAR(30) NOT NULL,
+      patient_name VARCHAR(150) NOT NULL,
+      appointment_date DATE NOT NULL,
+      slot VARCHAR(50) NOT NULL,
+      token_number INTEGER NOT NULL,
+      status VARCHAR(30) DEFAULT 'BOOKED',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (
+        hospital_id,
+        doctor_id,
+        appointment_date,
+        slot,
+        token_number
+      )
+    );
+
+    CREATE TABLE IF NOT EXISTS token_queue (
+      id BIGSERIAL PRIMARY KEY,
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+      doctor_id INTEGER NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+      patient_id INTEGER
+        REFERENCES patients(id)
+        ON DELETE SET NULL,
+      patient_phone VARCHAR(30),
+      patient_name VARCHAR(150),
+      token_date DATE NOT NULL,
+      token_number INTEGER NOT NULL,
+      source VARCHAR(20) NOT NULL
+        CHECK (
+          source IN ('ONLINE', 'OFFLINE')
+        ),
+      status VARCHAR(30) DEFAULT 'WAITING'
+        CHECK (
+          status IN (
+            'WAITING',
+            'CALLED',
+            'COMPLETED',
+            'CANCELLED'
+          )
+        ),
+      issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      called_at TIMESTAMP,
+      completed_at TIMESTAMP,
+      cancelled_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (
+        hospital_id,
+        doctor_id,
+        token_date,
+        token_number
+      )
+    );
+
+    CREATE INDEX IF NOT EXISTS
+      idx_token_queue_doctor_date
+    ON token_queue (
+      hospital_id,
+      doctor_id,
+      token_date
+    );
+
+    CREATE INDEX IF NOT EXISTS
+      idx_token_queue_patient
+    ON token_queue (
+      patient_phone,
+      token_date
+    );
+
+    CREATE TABLE IF NOT EXISTS emergency_requests (
+      id SERIAL PRIMARY KEY,
+      hospital_id INTEGER
+        REFERENCES hospitals(id)
+        ON DELETE SET NULL,
+      phone VARCHAR(30) NOT NULL,
+      patient_name VARCHAR(150),
+      patient_phone VARCHAR(30),
+      message TEXT,
+      status VARCHAR(30) DEFAULT 'OPEN',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS whatsapp_connections (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER UNIQUE NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      waba_id VARCHAR(150),
+
+      phone_number_id VARCHAR(150)
+        UNIQUE NOT NULL,
+
+      business_phone_number VARCHAR(30),
+
+      display_name VARCHAR(200),
+
+      access_token TEXT NOT NULL,
+
+      verify_token VARCHAR(200),
+
+      graph_version VARCHAR(30)
+        DEFAULT 'v23.0',
+
+      is_connected BOOLEAN
+        DEFAULT FALSE,
+
+      is_active BOOLEAN
+        DEFAULT TRUE,
+
+      last_verified_at TIMESTAMP,
+
+      created_at TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS smartclinic_plans (
+      id SERIAL PRIMARY KEY,
+
+      plan_name VARCHAR(100)
+        UNIQUE NOT NULL,
+
+      price NUMERIC(10,2)
+        DEFAULT 0,
+
+      billing_cycle VARCHAR(30)
+        DEFAULT 'MONTHLY',
+
+      is_active BOOLEAN
+        DEFAULT TRUE,
+
+      created_at TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS hospital_subscriptions (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER UNIQUE NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      plan_id INTEGER
+        REFERENCES smartclinic_plans(id)
+        ON DELETE SET NULL,
+
+      status VARCHAR(30)
+        DEFAULT 'FREE',
+
+      starts_at TIMESTAMP,
+
+      expires_at TIMESTAMP,
+
+      payment_reference VARCHAR(200),
+
+      created_at TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /*
+   * IMPORTANT:
+   * Existing Render production database mein
+   * whatsapp_connections table already bana hua tha.
+   *
+   * CREATE TABLE IF NOT EXISTS existing table ko modify nahi karta.
+   * Isliye access_token column ko separately ensure kar rahe hain.
+   */
+
+  await pool.query(`
+    ALTER TABLE whatsapp_connections
+    ADD COLUMN IF NOT EXISTS access_token TEXT;
+  `);
+
+
+  /*
+   * SmartClinic plans
+   */
+
+  await pool.query(`
+    INSERT INTO smartclinic_plans
+    (
+      plan_name,
+      price,
+      billing_cycle
+    )
+    VALUES
+    (
+      'FREE',
+      0,
+      'MONTHLY'
+    )
+    ON CONFLICT (
+      plan_name
+    )
+    DO NOTHING;
+  `);
+
+
+  console.log(
+    "■ SmartClinic database initialized"
+  );
+
+
 /* =========================================================
 SESSION HELPERS
 ========================================================= */
