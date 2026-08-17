@@ -2649,7 +2649,74 @@ async function handleTokenStatus(phone, lang) {
 /* =========================================================
    START APPOINTMENT BOOKING
 ========================================================= */
+/* =====================================================
+   TOKEN DOCTOR SELECTION
+===================================================== */
 
+if (
+  session.state ===
+  "WAIT_TOKEN_DOCTOR"
+) {
+
+  if (
+    id &&
+    id.startsWith("TOKEN_DOCTOR_")
+  ) {
+
+    const doctorId =
+      Number(
+        id.replace(
+          "TOKEN_DOCTOR_",
+          ""
+        )
+      );
+
+    const hospitalId =
+      Number(
+        session.temp_data?.hospital_id
+      );
+
+    if (
+      !doctorId ||
+      !hospitalId
+    ) {
+
+      await sendText(
+        phone,
+        TEXTS[lang].invalidInput
+      );
+
+      await setSession(
+        phone,
+        "MAIN_MENU",
+        {}
+      );
+
+      await sendMainMenu(
+        phone,
+        patient
+      );
+
+      return;
+    }
+
+    await bookTokenForDoctor(
+      phone,
+      doctorId,
+      hospitalId,
+      lang
+    );
+
+    return;
+  }
+
+  await startTokenBooking(
+    phone,
+    lang
+  );
+
+  return;
+}
 async function startBooking(
   phone,
   lang
