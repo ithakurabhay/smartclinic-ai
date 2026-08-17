@@ -462,86 +462,57 @@ const TEXTS = {
 
 };
 
-/* =========================================================
+
+/* =======================================================
+
    DATABASE INITIALIZATION
+   SMARTCLINIC AI — MULTI-HOSPITAL FOUNDATION
 ========================================================= */
+
 async function initDB() {
 
   /* =====================================================
-     EXISTING TABLES — DO NOT DELETE
+     1. PATIENTS
+     Existing patient data preserved
   ===================================================== */
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS patients (
       id SERIAL PRIMARY KEY,
+
       phone VARCHAR(30) UNIQUE NOT NULL,
+
       name VARCHAR(150) NOT NULL,
+
       language VARCHAR(5) DEFAULT 'en',
+
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
+
+  /* =====================================================
+     2. SESSIONS
+     Existing WhatsApp sessions preserved
+  ===================================================== */
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS sessions (
       phone VARCHAR(30) PRIMARY KEY,
+
       state VARCHAR(50) DEFAULT 'START',
+
       temp_data JSONB DEFAULT '{}'::jsonb,
+
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
 
   /* =====================================================
-     APPOINTMENTS
-  ===================================================== */
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS appointments (
-      id SERIAL PRIMARY KEY,
-
-      phone VARCHAR(30) NOT NULL,
-
-      patient_name VARCHAR(150) NOT NULL,
-
-      appointment_date DATE NOT NULL,
-
-      slot VARCHAR(50) NOT NULL,
-
-      token_number INTEGER NOT NULL,
-
-      status VARCHAR(30) DEFAULT 'BOOKED',
-
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-      UNIQUE(appointment_date, slot, token_number)
-    );
-  `);
-
-
-  /* =====================================================
-     EMERGENCY REQUESTS
-  ===================================================== */
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS emergency_requests (
-      id SERIAL PRIMARY KEY,
-
-      phone VARCHAR(30) NOT NULL,
-
-      patient_name VARCHAR(150),
-
-      message TEXT,
-
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-
-  /* =====================================================
-     HOSPITALS
-     Super Admin manages hospitals
+     3. HOSPITALS
   ===================================================== */
 
   await pool.query(`
@@ -572,31 +543,16 @@ async function initDB() {
 
 
   /* =====================================================
-     DOCTORS
-     Each doctor belongs to one hospital
+     4. HOSPITAL SERVICES
   ===================================================== */
 
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS doctors (
+    CREATE TABLE IF NOT EXISTS hospital_services (
       id SERIAL PRIMARY KEY,
 
-      hospital_id INTEGER NOT NULL
+      hospital_id INTEGER UNIQUE NOT NULL
         REFERENCES hospitals(id)
         ON DELETE CASCADE,
-
-      doctor_name VARCHAR(200) NOT NULL,
-
-      specialization VARCHAR(150),
-
-      /* Doctor-wise charges */
-
-      appointment_charge NUMERIC(10,2) DEFAULT 0,
-
-      token_charge NUMERIC(10,2) DEFAULT 0,
-
-      emergency_charge NUMERIC(10,2) DEFAULT 0,
-
-      /* Doctor-wise service availability */
 
       appointment_enabled BOOLEAN DEFAULT TRUE,
 
@@ -604,13 +560,9 @@ async function initDB() {
 
       emergency_enabled BOOLEAN DEFAULT TRUE,
 
-      /* Average time required for one patient */
+      cash_payment_enabled BOOLEAN DEFAULT TRUE,
 
-      average_consultation_minutes INTEGER DEFAULT 5,
-
-      /* Doctor status */
-
-      is_active BOOLEAN DEFAULT TRUE,
+      online_payment_enabled BOOLEAN DEFAULT TRUE,
 
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -620,46 +572,7 @@ async function initDB() {
 
 
   /* =====================================================
-     HOSPITAL SERVICES
-     Super Admin controls which services hospital gets
-  ===================================================== */
-/* =====================================================
-   HOSPITAL SERVICES
-   Super Admin controls which services hospital gets
-   Hospital Admin can manage payment availability
-===================================================== */
-
-await pool.query(`
-  CREATE TABLE IF NOT EXISTS hospital_services (
-    id SERIAL PRIMARY KEY,
-
-    hospital_id INTEGER UNIQUE NOT NULL
-      REFERENCES hospitals(id)
-      ON DELETE CASCADE,
-
-    /* Main services */
-
-    appointment_enabled BOOLEAN DEFAULT TRUE,
-
-    token_enabled BOOLEAN DEFAULT TRUE,
-
-    emergency_enabled BOOLEAN DEFAULT TRUE,
-
-    /* Payment methods */
-
-    cash_payment_enabled BOOLEAN DEFAULT TRUE,
-
-    online_payment_enabled BOOLEAN DEFAULT TRUE,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-`);
-
-  /* =====================================================
-     HOSPITAL ADMINS
-     Super Admin creates hospital admin login
+     5. HOSPITAL ADMINS
   ===================================================== */
 
   await pool.query(`
@@ -686,8 +599,313 @@ await pool.query(`
 
 
   /* =====================================================
-     TOKENS
-     Normal OPD token system
+     6. SUPER ADMINS
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS super_admins (
+      id SERIAL PRIMARY KEY,
+
+      name VARCHAR(150) NOT NULL,
+
+      email VARCHAR(150) UNIQUE NOT NULL,
+
+      password_hash TEXT NOT NULL,
+
+      is_active BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     7. DOCTORS
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS doctors (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      doctor_name VARCHAR(200) NOT NULL,
+
+      specialization VARCHAR(150),
+
+      appointment_charge NUMERIC(10,2) DEFAULT 0,
+
+      token_charge NUMERIC(10,2) DEFAULT 0,
+
+      emergency_charge NUMERIC(10,2) DEFAULT 0,
+
+      appointment_enabled BOOLEAN DEFAULT TRUE,
+
+      token_enabled BOOLEAN DEFAULT TRUE,
+
+      emergency_enabled BOOLEAN DEFAULT TRUE,
+
+      average_consultation_minutes INTEGER DEFAULT 5,
+
+      is_on_duty BOOLEAN DEFAULT FALSE,
+
+      is_active BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      CONSTRAINT doctors_consultation_time_check
+        CHECK (average_consultation_minutes > 0)
+    );
+  `);
+
+
+  /* =====================================================
+     8. EXISTING DOCTORS — SAFE MIGRATION
+  ===================================================== */
+
+  await pool.query(`
+    ALTER TABLE doctors
+      ADD COLUMN IF NOT EXISTS is_on_duty BOOLEAN DEFAULT FALSE;
+
+    ALTER TABLE doctors
+      ADD COLUMN IF NOT EXISTS average_consultation_minutes INTEGER DEFAULT 5;
+  `);
+
+
+  /* =====================================================
+     9. DOCTOR PAYMENT SETTINGS
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS doctor_payment_settings (
+      id SERIAL PRIMARY KEY,
+
+      doctor_id INTEGER UNIQUE NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+
+      appointment_cash_enabled BOOLEAN DEFAULT TRUE,
+
+      appointment_online_enabled BOOLEAN DEFAULT TRUE,
+
+      token_cash_enabled BOOLEAN DEFAULT TRUE,
+
+      token_online_enabled BOOLEAN DEFAULT TRUE,
+
+      emergency_cash_enabled BOOLEAN DEFAULT TRUE,
+
+      emergency_online_enabled BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     10. DOCTOR WEEKLY SCHEDULE
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS doctor_schedules (
+      id SERIAL PRIMARY KEY,
+
+      doctor_id INTEGER NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+
+      day_of_week INTEGER NOT NULL
+        CHECK (day_of_week BETWEEN 0 AND 6),
+
+      is_working BOOLEAN DEFAULT TRUE,
+
+      start_time TIME,
+
+      end_time TIME,
+
+      break_start_time TIME,
+
+      break_end_time TIME,
+
+      online_token_start_time TIME,
+
+      online_token_end_time TIME,
+
+      appointment_enabled BOOLEAN DEFAULT TRUE,
+
+      token_enabled BOOLEAN DEFAULT TRUE,
+
+      emergency_enabled BOOLEAN DEFAULT TRUE,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      UNIQUE(doctor_id, day_of_week)
+    );
+  `);
+
+
+  /* =====================================================
+     11. EXISTING APPOINTMENTS — PRESERVE
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS appointments (
+      id SERIAL PRIMARY KEY,
+
+      phone VARCHAR(30) NOT NULL,
+
+      patient_name VARCHAR(150) NOT NULL,
+
+      appointment_date DATE NOT NULL,
+
+      slot VARCHAR(50) NOT NULL,
+
+      token_number INTEGER NOT NULL,
+
+      status VARCHAR(30) DEFAULT 'BOOKED',
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      UNIQUE(appointment_date, slot, token_number)
+    );
+  `);
+
+
+  /* =====================================================
+     12. APPOINTMENT MIGRATION COLUMNS
+  ===================================================== */
+
+  await pool.query(`
+    ALTER TABLE appointments
+      ADD COLUMN IF NOT EXISTS hospital_id INTEGER,
+      ADD COLUMN IF NOT EXISTS doctor_id INTEGER,
+      ADD COLUMN IF NOT EXISTS payment_mode VARCHAR(20),
+      ADD COLUMN IF NOT EXISTS payment_status VARCHAR(30) DEFAULT 'PENDING';
+  `);
+
+
+  /* =====================================================
+     13. MASTER TOKEN QUEUE
+     
+     ONLINE + OFFLINE USE THE SAME QUEUE
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS token_queue (
+      id BIGSERIAL PRIMARY KEY,
+
+      hospital_id INTEGER NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      doctor_id INTEGER NOT NULL
+        REFERENCES doctors(id)
+        ON DELETE CASCADE,
+
+      patient_id INTEGER
+        REFERENCES patients(id)
+        ON DELETE SET NULL,
+
+      patient_phone VARCHAR(30),
+
+      patient_name VARCHAR(150),
+
+      token_date DATE NOT NULL,
+
+      token_number INTEGER NOT NULL,
+
+      source VARCHAR(20) NOT NULL,
+
+      status VARCHAR(30) DEFAULT 'WAITING',
+
+      payment_mode VARCHAR(20),
+
+      payment_status VARCHAR(30) DEFAULT 'PENDING',
+
+      issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      called_at TIMESTAMP,
+
+      completed_at TIMESTAMP,
+
+      cancelled_at TIMESTAMP,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      CONSTRAINT token_queue_source_check
+        CHECK (source IN ('ONLINE', 'OFFLINE')),
+
+      CONSTRAINT token_queue_status_check
+        CHECK (
+          status IN (
+            'WAITING',
+            'CALLED',
+            'COMPLETED',
+            'CANCELLED'
+          )
+        ),
+
+      CONSTRAINT token_queue_unique_number
+        UNIQUE(
+          hospital_id,
+          doctor_id,
+          token_date,
+          token_number
+        )
+    );
+  `);
+
+
+  /* =====================================================
+     14. TOKEN QUEUE INDEXES
+  ===================================================== */
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_token_queue_doctor_date
+    ON token_queue (
+      hospital_id,
+      doctor_id,
+      token_date
+    );
+  `);
+
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_token_queue_patient
+    ON token_queue (
+      patient_phone,
+      token_date
+    );
+  `);
+
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_token_queue_status
+    ON token_queue (
+      hospital_id,
+      doctor_id,
+      token_date,
+      status
+    );
+  `);
+
+
+  /* =====================================================
+     15. EXISTING TOKENS TABLE
+     
+     DO NOT DELETE.
+     Existing system data remains safe.
   ===================================================== */
 
   await pool.query(`
@@ -714,13 +932,20 @@ await pool.query(`
 
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-      UNIQUE(hospital_id, doctor_id, token_date, token_number)
+      UNIQUE(
+        hospital_id,
+        doctor_id,
+        token_date,
+        token_number
+      )
     );
   `);
 
 
   /* =====================================================
-     PAYMENTS
+     16. EXISTING PAYMENTS TABLE
+     
+     DO NOT DELETE.
   ===================================================== */
 
   await pool.query(`
@@ -755,30 +980,143 @@ await pool.query(`
 
 
   /* =====================================================
-     SUCCESS LOG
+     17. EMERGENCY REQUESTS
   ===================================================== */
 
-  console.log("✅ Database schema verified successfully.");
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS emergency_requests (
+      id SERIAL PRIMARY KEY,
 
-  console.log("🏥 Hospitals table ready.");
+      phone VARCHAR(30) NOT NULL,
 
-  console.log("👨‍⚕️ Doctors table ready.");
+      patient_name VARCHAR(150),
 
-  console.log("🎟️ Token system ready.");
+      message TEXT,
 
-  console.log("📅 Appointment system ready.");
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-  console.log("🚨 Emergency system ready.");
 
-  console.log("💰 Payment system ready.");
+  /* =====================================================
+     18. EMERGENCY MIGRATION COLUMNS
+  ===================================================== */
 
-  console.log("💵 Cash / 🌐 Online payment settings ready.");
+  await pool.query(`
+    ALTER TABLE emergency_requests
+      ADD COLUMN IF NOT EXISTS hospital_id INTEGER,
+      ADD COLUMN IF NOT EXISTS doctor_id INTEGER,
+      ADD COLUMN IF NOT EXISTS payment_mode VARCHAR(20),
+      ADD COLUMN IF NOT EXISTS payment_status VARCHAR(30) DEFAULT 'PENDING',
+      ADD COLUMN IF NOT EXISTS status VARCHAR(30) DEFAULT 'OPEN';
+  `);
 
-  console.log("👑 Hospital Admin system ready.");
 
+  /* =====================================================
+     19. WHATSAPP CONNECTIONS
+     
+     One WhatsApp connection per hospital.
+  ===================================================== */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS whatsapp_connections (
+      id SERIAL PRIMARY KEY,
+
+      hospital_id INTEGER UNIQUE NOT NULL
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+      waba_id VARCHAR(150),
+
+      phone_number_id VARCHAR(150) UNIQUE,
+
+      business_phone_number VARCHAR(30),
+
+      display_name VARCHAR(200),
+
+      profile_photo_url TEXT,
+
+      about TEXT,
+
+      access_token_encrypted TEXT,
+
+      verify_token_encrypted TEXT,
+
+      graph_version VARCHAR(30) DEFAULT 'v23.0',
+
+      is_connected BOOLEAN DEFAULT FALSE,
+
+      is_active BOOLEAN DEFAULT TRUE,
+
+      last_verified_at TIMESTAMP,
+
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+
+  /* =====================================================
+     20. ANALYTICS INDEXES
+  ===================================================== */
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_appointments_hospital_date
+    ON appointments (
+      hospital_id,
+      appointment_date
+    );
+  `);
+
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_emergency_hospital_created
+    ON emergency_requests (
+      hospital_id,
+      created_at
+    );
+  `);
+
+
+  /* =====================================================
+     21. SAFE DEFAULTS
+  ===================================================== */
+
+  await pool.query(`
+    UPDATE doctors
+    SET average_consultation_minutes = 5
+    WHERE average_consultation_minutes IS NULL
+       OR average_consultation_minutes <= 0;
+  `);
+
+
+  await pool.query(`
+    UPDATE doctors
+    SET is_on_duty = FALSE
+    WHERE is_on_duty IS NULL;
+  `);
+
+
+  /* =====================================================
+     DATABASE READY
+  ===================================================== */
+
+  console.log("==============================================");
+  console.log("✅ SmartClinic database initialized");
+  console.log("🏥 Hospitals: READY");
+  console.log("👑 Super Admin: READY");
+  console.log("👤 Hospital Admin: READY");
+  console.log("👨‍⚕️ Doctors: READY");
+  console.log("📅 Doctor schedules: READY");
+  console.log("💰 Doctor charges: READY");
+  console.log("💳 Payment settings: READY");
+  console.log("🎟️ Master online/offline queue: READY");
+  console.log("🚨 Emergency system: READY");
+  console.log("📱 WhatsApp connections: READY");
+  console.log("📊 Analytics foundation: READY");
+  console.log("==============================================");
 }
-
-
 /* =========================================================
    DATABASE HELPERS
 ========================================================= */
@@ -3050,7 +3388,3 @@ console.error(error?.stack);
 
 startServer();
 
-
-/* =========================================================
-   END OF SMARTCLINIC AI SERVER
-========================================================= */
