@@ -1412,6 +1412,7 @@ async function sendLanguageMenu(to) {
    MAIN MENU
 ========================================================= */
 
+
 async function sendMainMenu(to, patient) {
 
   const lang = patient.language || "en";
@@ -1445,9 +1446,11 @@ async function sendMainMenu(to, patient) {
             title: t.emergency
           },
 
+
           {
-             id: "TOKEN_STATUS",
-             title: t.token || "🎟️ Token / Queue Status"
+            id: "TOKEN_MENU",
+            title: "🎟️ Token Services"
+          
           },
 
           {
@@ -1465,7 +1468,287 @@ async function sendMainMenu(to, patient) {
   );
 }
 
+/* =========================================================
+   TOKEN MENU
+========================================================= */
 
+async function sendTokenMenu(phone, lang) {
+
+  const t = TEXTS[lang] || TEXTS.en;
+
+  await sendList(
+    phone,
+
+    lang === "hi"
+      ? "🎟️ *टोकन सेवा*\n\nकृपया विकल्प चुनें:"
+      : "🎟️ *Token Services*\n\nPlease select an option:",
+
+    lang === "hi"
+      ? "टोकन विकल्प"
+      : "Token Options",
+
+    [
+      {
+        title: "SmartClinic",
+        rows: [
+          {
+            id: "BOOK_TOKEN",
+            title: t.bookToken
+          },
+                 
+          
+          
+          {
+            id: "TOKEN_STATUS",
+            title:
+              lang === "hi"
+                ? "📊 टोकन / कतार स्थिति"
+                : "📊 Token / Queue Status"
+          }
+        ]
+      }
+    ]
+  );
+}
+
+/* =========================================================
+   START TOKEN BOOKING
+========================================================= */
+
+async function startTokenBooking(phone, lang) {
+
+  const t =
+    TEXTS[lang] || TEXTS.en;
+
+  const hospitalId =
+    process.env.DEFAULT_HOSPITAL_ID;
+
+  if (!hospitalId) {
+
+    await sendText(
+      phone,
+      "⚠️ Hospital configuration is missing."
+    );
+
+    return;
+  }
+
+  const result =
+    await pool.query(
+      `
+      SELECT
+        id,
+        doctor_name,
+        average_consultation_minutes
+      FROM doctors
+      WHERE hospital_id = $1
+        AND COALESCE(is_on_duty, FALSE) = TRUE
+      ORDER BY id
+      `,
+      [hospitalId]
+    );
+
+  if (!result.rows.length) {
+
+    await sendText(
+      phone,
+      t.doctorNotAvailable
+    );
+
+    return;
+  }
+
+  const rows =
+    result.rows.map((doctor) => ({
+      id: `TOKEN_DOCTOR_${doctor.id}`,
+      title: doctor.doctor_name
+    }));
+
+  await setSession(
+    phone,
+    "WAIT_TOKEN_DOCTOR",
+    {
+      hospital_id: Number(hospitalId)
+    }
+  );
+
+  await sendList(
+    phone,
+    t.chooseTokenDoctor,
+    lang === "hi"
+      ? "डॉक्टर चुनें"
+      : "Select Doctor",
+    [
+      {
+        title:
+          lang === "hi"
+            ? "उपलब्ध डॉक्टर"
+            : "Available Doctors",
+
+        rows
+      }
+    ]
+  );
+}
+/* =========================================================
+   BOOK TOKEN FOR DOCTOR
+========================================================= */
+
+async function bookTokenForDoctor(
+  phone,
+  doctorId,
+  hospitalId,
+  lang
+) {
+
+  const patient =
+    await getPatient(phone);
+
+  if (!patient) {
+
+    await startRegistration(phone);
+
+    return;
+  }
+
+  const doctorResult =
+    await pool.query(
+      `
+      SELECT
+        id,
+        doctor_name
+      FROM doctors
+      WHERE id = $1
+        AND hospital_id = $2
+      LIMIT 1
+      `,
+      [
+        doctorId,
+        hospitalId
+      ]
+    );
+
+  if (!doctorResult.rows.length) {
+
+    await sendText(
+      phone,
+      TEXTS[lang].doctorNotAvailable
+    );
+
+    return;
+  }
+
+  const doctor =
+    doctorResult.rows[0];
+
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  /* =====================================================
+     GET NEXT TOKEN
+  ===================================================== */
+
+  const tokenResult =
+    await pool.query(
+      `
+      SELECT
+        COALESCE(
+          MAX(token_number),
+          0
+        ) + 1 AS next_token
+      FROM token_queue
+      WHERE hospital_id = $1
+        AND doctor_id = $2
+        AND token_date = $3
+      `,
+      [
+        hospitalId,
+        doctorId,
+        today
+      ]
+    );
+
+  const tokenNumber =
+    Number(
+      tokenResult.rows[0].next_token
+    );
+
+  /* =====================================================
+     INSERT INTO MASTER QUEUE
+  ===================================================== */
+
+  await pool.query(
+    `
+    INSERT INTO token_queue
+    (
+      hospital_id,
+      doctor_id,
+      patient_id,
+      patient_phone,
+      patient_name,
+      token_date,
+      token_number,
+      source,
+      status
+    )
+    VALUES
+    (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5,
+      $6,
+      $7,
+      'ONLINE',
+      'WAITING'
+    )
+    `,
+    [
+      hospitalId,
+      doctorId,
+      patient.id,
+      phone,
+      patient.name,
+      today,
+      tokenNumber
+    ]
+  );
+
+  /* =====================================================
+     CONFIRMATION
+  ===================================================== */
+
+  const t =
+    TEXTS[lang] || TEXTS.en;
+
+  await sendText(
+    phone,
+
+    t.tokenBooked(
+      tokenNumber,
+      doctor.doctor_name,
+      0
+    )
+  );
+
+  /* =====================================================
+     RESET SESSION
+  ===================================================== */
+
+  await setSession(
+    phone,
+    "MAIN_MENU",
+    {}
+  );
+
+  await sendMainMenu(
+    phone,
+    patient
+  );
+}
 /* =========================================================
    DATE HELPERS
 ========================================================= */
@@ -2069,90 +2352,174 @@ async function handleMyDetails(
 /* =========================================================
    TOKEN STATUS
 ========================================================= */
+async function handleTokenStatus(phone, lang) {
 
-async function handleTokenStatus(
-  phone,
-  lang
-) {
-
-  const patient =
-    await getPatient(phone);
+  const patient = await getPatient(phone);
 
   if (!patient) {
-
     await startRegistration(phone);
     return;
   }
 
-  const today =
-    new Date()
-      .toISOString()
-      .split("T")[0];
+  const today = new Date()
+    .toISOString()
+    .split("T")[0];
 
-  const result =
-    await pool.query(
-      `
-      SELECT *
-      FROM appointments
-      WHERE phone = $1
-        AND appointment_date = $2
-        AND status = 'BOOKED'
-      ORDER BY id DESC
-      LIMIT 1
-      `,
-      [phone, today]
-    );
+  /* =========================================
+     GET PATIENT'S ACTIVE TOKEN
+     TOKEN SYSTEM ONLY
+     NO APPOINTMENTS TABLE
+  ========================================= */
 
-  const t =
-    TEXTS[lang];
+  const tokenResult = await pool.query(
+    `
+    SELECT
+      tq.*,
+      d.doctor_name,
+      d.average_consultation_minutes
+    FROM token_queue tq
+    LEFT JOIN doctors d
+      ON d.id = tq.doctor_id
+    WHERE tq.patient_phone = $1
+      AND tq.token_date = $2
+      AND tq.status IN ('WAITING', 'CALLED')
+    ORDER BY tq.id DESC
+    LIMIT 1
+    `,
+    [phone, today]
+  );
 
-  if (!result.rows.length) {
+  const t = TEXTS[lang] || TEXTS.en;
 
-    await sendText(
-      phone,
-      t.noToken
-    );
+  /* =========================================
+     NO ACTIVE TOKEN
+  ========================================= */
 
-  } else {
-
-    const appointment =
-      result.rows[0];
-
-    const positionResult =
-      await pool.query(
-        `
-        SELECT COUNT(*)::int AS position
-        FROM appointments
-        WHERE appointment_date = $1
-          AND slot = $2
-          AND token_number < $3
-          AND status = 'BOOKED'
-        `,
-        [
-          appointment.appointment_date,
-          appointment.slot,
-          appointment.token_number
-        ]
-      );
-
-    const position =
-      Number(
-        positionResult.rows[0].position
-      );
+  if (!tokenResult.rows.length) {
 
     await sendText(
       phone,
-
-      t.tokenStatus(
-        appointment.token_number,
-        formatDate(
-          appointment.appointment_date
-        ),
-        appointment.slot,
-        position
-      )
+      t.noActiveToken
     );
+
+    await setSession(
+      phone,
+      "MAIN_MENU",
+      {}
+    );
+
+    await sendMainMenu(
+      phone,
+      patient
+    );
+
+    return;
   }
+
+  const token = tokenResult.rows[0];
+
+  /* =========================================
+     ACTIVE TOKEN
+  ========================================= */
+
+  const activeTokenResult = await pool.query(
+    `
+    SELECT COALESCE(MAX(token_number), 0) AS active_token
+    FROM token_queue
+    WHERE hospital_id = $1
+      AND doctor_id = $2
+      AND token_date = $3
+      AND status = 'CALLED'
+    `,
+    [
+      token.hospital_id,
+      token.doctor_id,
+      today
+    ]
+  );
+
+  const activeToken =
+    Number(
+      activeTokenResult.rows[0]?.active_token || 0
+    );
+
+  /* =========================================
+     PATIENTS AHEAD
+  ========================================= */
+
+  const patientsAheadResult = await pool.query(
+    `
+    SELECT COUNT(*)::int AS patients_ahead
+    FROM token_queue
+    WHERE hospital_id = $1
+      AND doctor_id = $2
+      AND token_date = $3
+      AND token_number < $4
+      AND status = 'WAITING'
+    `,
+    [
+      token.hospital_id,
+      token.doctor_id,
+      today,
+      token.token_number
+    ]
+  );
+
+  const patientsAhead =
+    Number(
+      patientsAheadResult.rows[0]?.patients_ahead || 0
+    );
+
+  /* =========================================
+     ESTIMATED WAITING TIME
+  ========================================= */
+
+  const averageMinutes =
+    Number(
+      token.average_consultation_minutes || 5
+    );
+
+  const waitMinutes =
+    patientsAhead * averageMinutes;
+
+  /* =========================================
+     ESTIMATED TURN
+  ========================================= */
+
+  const estimatedDate =
+    new Date(
+      Date.now() +
+      waitMinutes * 60 * 1000
+    );
+
+  const estimatedTime =
+    estimatedDate.toLocaleTimeString(
+      "en-IN",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+  /* =========================================
+     SEND TOKEN STATUS
+  ========================================= */
+
+  await sendText(
+    phone,
+
+    t.tokenStatusMessage(
+      token.token_number,
+      activeToken,
+      patientsAhead,
+      waitMinutes,
+      estimatedTime
+    )
+  );
+
+  /* =========================================
+     BACK TO MAIN MENU
+  ========================================= */
 
   await setSession(
     phone,
@@ -2569,9 +2936,26 @@ case "EMERGENCY_NO":
       patient
     );
 
-    break;
+    
 
+  break;
 
+  case "TOKEN_MENU":
+
+  await sendTokenMenu(
+    phone,
+    lang
+  );
+  case "BOOK_TOKEN":
+
+  await startTokenBooking(
+    phone,
+    lang
+  );
+
+  
+
+  break;
     case "TOKEN_STATUS":
 
       await handleTokenStatus(
