@@ -39,9 +39,7 @@ const DB_CONFIG = {
   user: process.env.PGUSER,
   password: process.env.PGPASSWORD,
   database: process.env.PGDATABASE,
-  ssl: {
-    rejectUnauthorized: false
-  }
+
 };
 const pool =
   new Pool(DB_CONFIG);
@@ -348,7 +346,10 @@ hindi:
 };
 /* =========================================================
 DATABASE INITIALIZATION
+========================================================= */
+
 async function initDB() {
+
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS hospitals (
@@ -629,7 +630,7 @@ async function initDB() {
   console.log(
     "■ SmartClinic database initialized"
   );
-
+}
 
 /* =========================================================
 SESSION HELPERS
