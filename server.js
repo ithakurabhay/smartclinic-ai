@@ -601,20 +601,6 @@ async function initDB() {
   `);
 
 
-  /*
-   * IMPORTANT:
-   * Existing Render production database mein
-   * whatsapp_connections table already bana hua tha.
-   *
-   * CREATE TABLE IF NOT EXISTS existing table ko modify nahi karta.
-   * Isliye access_token column ko separately ensure kar rahe hain.
-   */
-
-  await pool.query(`
-    ALTER TABLE whatsapp_connections
-    ADD COLUMN IF NOT EXISTS access_token TEXT;
-  `);
-
 
   /*
    * SmartClinic plans
