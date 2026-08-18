@@ -48,10 +48,10 @@ const TEXTS = {
   en: {
 
     welcome:
-      `Welcome to *${CLINIC_NAME}* ≡ƒÅÑ\n\nPlease select your preferred language:`,
+      `Welcome to *${CLINIC_NAME}* 🏥\n\nPlease select your preferred language:`,
 
-    langEnglish: "≡ƒç¼≡ƒçº English",
-    langHindi: "≡ƒç«≡ƒç│ αñ╣αñ┐αñéαñªαÑÇ",
+    langEnglish: "🇬🇧 English",
+    langHindi: "🇮🇳 हिंदी",
 
     askName:
       "Great! What is your *full name*?",
@@ -66,72 +66,72 @@ const TEXTS = {
       "Please enter a valid 10-digit phone number.",
 
     registrationDone: (name) =>
-      `Thank you, *${name}*!\n\nYour registration is complete Γ£à`,
+      `Thank you, *${name}*!\n\nYour registration is complete ✅`,
 
       mainMenuHeader: (name) =>
-  `Hi *${name}* ≡ƒæï\n\nHow can we help you today?`,
+  `Hi *${name}* 👋\n\nHow can we help you today?`,
 
-    mainMenuButton: "≡ƒôï Open Menu",
+    mainMenuButton: "📋 Open Menu",
 
-    book: "≡ƒôà Book Appointment",
-    timing: "≡ƒæ¿ΓÇìΓÜò∩╕Å Doctor Timings",
-    emergency: "≡ƒÜ¿ Emergency",
-    token: "≡ƒÄƒ∩╕Å Token / Queue Status",
-    language: "≡ƒîÉ Change Language",
-    details: "≡ƒæñ My Details",
+    book: "📅 Book Appointment",
+    timing: "👨‍⚕️ Doctor Timings",
+    emergency: "🚨 Emergency",
+    token: "🎟️ Token / Queue Status",
+    language: "🌐 Change Language",
+    details: "👤 My Details",
 
-    mainMenu: "≡ƒÅá Main Menu",
+    mainMenu: "🏠 Main Menu",
 
     chooseDate:
-      "≡ƒôà Please choose a date for your appointment:",
+      "📅 Please choose a date for your appointment:",
 
     chooseDateButton:
       "Select Date",
 
     chooseSlot:
-      "≡ƒòÉ Choose an available time slot:",
+      "🕐 Choose an available time slot:",
 
     noSlots:
       "Sorry, no slots are available for this date.",
 
     confirmAppointment: (date, slot) =>
-      `Please confirm your appointment:\n\n≡ƒôà Date: *${date}*\n≡ƒòÉ Slot: *${slot}*\n≡ƒæ¿ΓÇìΓÜò∩╕Å Doctor: *${DOCTOR_NAME}*`,
+      `Please confirm your appointment:\n\n📅 Date: *${date}*\n🕐 Slot: *${slot}*\n👨‍⚕️ Doctor: *${DOCTOR_NAME}*`,
 
-    confirmYes: "Γ£à Confirm",
-    confirmNo: "Γ¥î Cancel",
+    confirmYes: "✅ Confirm",
+    confirmNo: "❌ Cancel",
 
     appointmentBooked: (token, date, slot) =>
-      `≡ƒÄë *Appointment booked successfully!*\n\n≡ƒÄƒ∩╕Å Token Number: *${token}*\n≡ƒôà Date: *${date}*\n≡ƒòÉ Slot: *${slot}*\n≡ƒæ¿ΓÇìΓÜò∩╕Å Doctor: *${DOCTOR_NAME}*\n\nPlease arrive a few minutes before your appointment. ≡ƒÖÅ`,
+      `🎉 *Appointment booked successfully!*\n\n🎟️ Token Number: *${token}*\n📅 Date: *${date}*\n🕐 Slot: *${slot}*\n👨‍⚕️ Doctor: *${DOCTOR_NAME}*\n\nPlease arrive a few minutes before your appointment. 🙏`,
 
     appointmentCancelled:
-      "Γ¥î Your appointment request was cancelled.\n\nYou can start again anytime from the Main Menu.",
+      "❌ Your appointment request was cancelled.\n\nYou can start again anytime from the Main Menu.",
 
     doctorTiming:
-      `≡ƒæ¿ΓÇìΓÜò∩╕Å *${DOCTOR_NAME} - Consultation Timings*\n\nMonday - Saturday\n≡ƒòÖ 10:00 AM - 1:00 PM\n≡ƒòö 5:00 PM - 8:00 PM\n\nSunday: Closed`,
+      `👨‍⚕️ *${DOCTOR_NAME} - Consultation Timings*\n\nMonday - Saturday\n🕙 10:00 AM - 1:00 PM\n🕔 5:00 PM - 8:00 PM\n\nSunday: Closed`,
 
     emergency:
-      "≡ƒÜ¿ *Emergency Assistance*\n\nIf this is a life-threatening medical emergency, please contact your nearest hospital/emergency service immediately.\n\nDo not wait for a WhatsApp response.",
+      "🚨 *Emergency Assistance*\n\nIf this is a life-threatening medical emergency, please contact your nearest hospital/emergency service immediately.\n\nDo not wait for a WhatsApp response.",
 
     emergencyRecorded:
-      "≡ƒÜ¿ Your emergency request has been recorded.\n\nPlease contact the nearest emergency medical service immediately. Our staff will review your request as soon as possible.",
+      "🚨 Your emergency request has been recorded.\n\nPlease contact the nearest emergency medical service immediately. Our staff will review your request as soon as possible.",
 
     noToken:
-      "≡ƒÄƒ∩╕Å You do not have any active appointment/token for today.\n\nWould you like to book an appointment?",
+      "🎟️ You do not have any active appointment/token for today.\n\nWould you like to book an appointment?",
 
     tokenStatus: (token, date, slot, position) =>
-      `≡ƒÄƒ∩╕Å *Your Token: ${token}*\n\n≡ƒôà Date: ${date}\n≡ƒòÉ Slot: ${slot}\n≡ƒæÑ Patients ahead of you: ${position}`,
+      `🎟️ *Your Token: ${token}*\n\n📅 Date: ${date}\n🕐 Slot: ${slot}\n👥 Patients ahead of you: ${position}`,
 
     myDetails: (name, phone, lang) =>
-      `≡ƒæñ *Your Details*\n\nName: ${name}\nPhone: ${phone}\nLanguage: ${lang === "hi" ? "Hindi" : "English"}`,
+      `👤 *Your Details*\n\nName: ${name}\nPhone: ${phone}\nLanguage: ${lang === "hi" ? "Hindi" : "English"}`,
 
     languageChanged:
-      "≡ƒîÉ Language changed successfully.",
+      "🌐 Language changed successfully.",
 
     invalidInput:
-      "ΓÜá∩╕Å Sorry, I didn't understand that.\n\nPlease choose one of the available options.",
+      "⚠️ Sorry, I didn't understand that.\n\nPlease choose one of the available options.",
 
     back:
-      "Γ¼à∩╕Å Back",
+      "⬅️ Back",
 
     yes:
       "Yes",
@@ -144,93 +144,93 @@ const TEXTS = {
   hi: {
 
     welcome:
-      `*${CLINIC_NAME}* αñ«αÑçαñé αñåαñ¬αñòαñ╛ αñ╕αÑìαñ╡αñ╛αñùαññ αñ╣αÑê ≡ƒÅÑ\n\nαñòαÑâαñ¬αñ»αñ╛ αñàαñ¬αñ¿αÑÇ αñ¬αñ╕αñéαñªαÑÇαñªαñ╛ αñ¡αñ╛αñ╖αñ╛ αñÜαÑüαñ¿αÑçαñé:`,
+      `*${CLINIC_NAME}* में आपका स्वागत है 🏥\n\nकृपया अपनी पसंदीदा भाषा चुनें:`,
 
-    langEnglish: "≡ƒç¼≡ƒçº English",
-    langHindi: "≡ƒç«≡ƒç│ αñ╣αñ┐αñéαñªαÑÇ",
+    langEnglish: "🇬🇧 English",
+    langHindi: "🇮🇳 हिंदी",
 
     askName:
-      "αñ¼αñ╣αÑüαññ αñ¼αñóαñ╝αñ┐αñ»αñ╛! αñòαÑâαñ¬αñ»αñ╛ αñàαñ¬αñ¿αñ╛ *αñ¬αÑéαñ░αñ╛ αñ¿αñ╛αñ«* αñ¡αÑçαñ£αÑçαñéαÑñ",
+      "बहुत बढ़िया! कृपया अपना *पूरा नाम* भेजें।",
 
     invalidName:
-      "αñòαÑâαñ¬αñ»αñ╛ αñ╕αñ╣αÑÇ αñ¿αñ╛αñ« αñªαñ░αÑìαñ£ αñòαñ░αÑçαñéαÑñ",
+      "कृपया सही नाम दर्ज करें।",
 
     askPhone:
-      "αñºαñ¿αÑìαñ»αñ╡αñ╛αñª! αñòαÑâαñ¬αñ»αñ╛ αñàαñ¬αñ¿αñ╛ *10 αñàαñéαñòαÑïαñé αñòαñ╛ αñ«αÑïαñ¼αñ╛αñçαñ▓ αñ¿αñéαñ¼αñ░* αñ¡αÑçαñ£αÑçαñéαÑñ",
+      "धन्यवाद! कृपया अपना *10 अंकों का मोबाइल नंबर* भेजें।",
 
     invalidPhone:
-      "αñòαÑâαñ¬αñ»αñ╛ αñ╕αñ╣αÑÇ 10 αñàαñéαñòαÑïαñé αñòαñ╛ αñ«αÑïαñ¼αñ╛αñçαñ▓ αñ¿αñéαñ¼αñ░ αñªαñ░αÑìαñ£ αñòαñ░αÑçαñéαÑñ",
+      "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।",
 
     registrationDone: (name) =>
-      `αñºαñ¿αÑìαñ»αñ╡αñ╛αñª, *${name}*!\n\nαñåαñ¬αñòαñ╛ αñ░αñ£αñ┐αñ╕αÑìαñƒαÑìαñ░αÑçαñ╢αñ¿ αñ¬αÑéαñ░αñ╛ αñ╣αÑï αñùαñ»αñ╛ αñ╣αÑê Γ£à`,
+      `धन्यवाद, *${name}*!\n\nआपका रजिस्ट्रेशन पूरा हो गया है ✅`,
 
-    mainMenuButton: "≡ƒôï αñ«αÑüαñûαÑìαñ» αñ«αÑçαñ¿αÑé",
+    mainMenuButton: "📋 मुख्य मेनू",
 
-    book: "≡ƒôà αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñ¼αÑüαñò αñòαñ░αÑçαñé",
-    timing: "≡ƒæ¿ΓÇìΓÜò∩╕Å αñíαÑëαñòαÑìαñƒαñ░ αñòαñ╛ αñ╕αñ«αñ»",
-    emergency: "≡ƒÜ¿ αñçαñ«αñ░αñ£αÑçαñéαñ╕αÑÇ",
-    token: "≡ƒÄƒ∩╕Å αñƒαÑïαñòαñ¿ / αñòαññαñ╛αñ░ αñ╕αÑìαñÑαñ┐αññαñ┐",
-    language: "≡ƒîÉ αñ¡αñ╛αñ╖αñ╛ αñ¼αñªαñ▓αÑçαñé",
-    details: "≡ƒæñ αñ«αÑçαñ░αÑÇ αñ£αñ╛αñ¿αñòαñ╛αñ░αÑÇ",
+    book: "📅 अपॉइंटमेंट बुक करें",
+    timing: "👨‍⚕️ डॉक्टर का समय",
+    emergency: "🚨 इमरजेंसी",
+    token: "🎟️ टोकन / कतार स्थिति",
+    language: "🌐 भाषा बदलें",
+    details: "👤 मेरी जानकारी",
 
-    mainMenu: "≡ƒÅá αñ«αÑüαñûαÑìαñ» αñ«αÑçαñ¿αÑé",
+    mainMenu: "🏠 मुख्य मेनू",
 
     chooseDate:
-      "≡ƒôà αñòαÑâαñ¬αñ»αñ╛ αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñòαÑç αñ▓αñ┐αñÅ αññαñ╛αñ░αÑÇαñû αñÜαÑüαñ¿αÑçαñé:",
+      "📅 कृपया अपॉइंटमेंट के लिए तारीख चुनें:",
 
     chooseDateButton:
-      "αññαñ╛αñ░αÑÇαñû αñÜαÑüαñ¿αÑçαñé",
+      "तारीख चुनें",
 
     chooseSlot:
-      "≡ƒòÉ αñòαÑâαñ¬αñ»αñ╛ αñëαñ¬αñ▓αñ¼αÑìαñº αñ╕αñ«αñ» αñÜαÑüαñ¿αÑçαñé:",
+      "🕐 कृपया उपलब्ध समय चुनें:",
 
     noSlots:
-      "αñòαÑìαñ╖αñ«αñ╛ αñòαñ░αÑçαñé, αñçαñ╕ αññαñ╛αñ░αÑÇαñû αñòαÑç αñ▓αñ┐αñÅ αñòαÑïαñê αñ╕αÑìαñ▓αÑëαñƒ αñëαñ¬αñ▓αñ¼αÑìαñº αñ¿αñ╣αÑÇαñé αñ╣αÑêαÑñ",
+      "क्षमा करें, इस तारीख के लिए कोई स्लॉट उपलब्ध नहीं है।",
 
     confirmAppointment: (date, slot) =>
-      `αñòαÑâαñ¬αñ»αñ╛ αñàαñ¬αñ¿αñ╛ αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñòαñ¿αÑìαñ½αñ░αÑìαñ« αñòαñ░αÑçαñé:\n\n≡ƒôà αññαñ╛αñ░αÑÇαñû: *${date}*\n≡ƒòÉ αñ╕αñ«αñ»: *${slot}*\n≡ƒæ¿ΓÇìΓÜò∩╕Å αñíαÑëαñòαÑìαñƒαñ░: *${DOCTOR_NAME}*`,
+      `कृपया अपना अपॉइंटमेंट कन्फर्म करें:\n\n📅 तारीख: *${date}*\n🕐 समय: *${slot}*\n👨‍⚕️ डॉक्टर: *${DOCTOR_NAME}*`,
 
-    confirmYes: "Γ£à αñòαñ¿αÑìαñ½αñ░αÑìαñ«",
-    confirmNo: "Γ¥î αñòαÑêαñéαñ╕αñ▓",
+    confirmYes: "✅ कन्फर्म",
+    confirmNo: "❌ कैंसल",
 
     appointmentBooked: (token, date, slot) =>
-      `≡ƒÄë *αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñ╕αñ½αñ▓αññαñ╛αñ¬αÑéαñ░αÑìαñ╡αñò αñ¼αÑüαñò αñ╣αÑï αñùαñ»αñ╛!*\n\n≡ƒÄƒ∩╕Å αñƒαÑïαñòαñ¿ αñ¿αñéαñ¼αñ░: *${token}*\n≡ƒôà αññαñ╛αñ░αÑÇαñû: *${date}*\n≡ƒòÉ αñ╕αñ«αñ»: *${slot}*\n≡ƒæ¿ΓÇìΓÜò∩╕Å αñíαÑëαñòαÑìαñƒαñ░: *${DOCTOR_NAME}*\n\nαñòαÑâαñ¬αñ»αñ╛ αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñ╕αÑç αñòαÑüαñ¢ αñ«αñ┐αñ¿αñƒ αñ¬αñ╣αñ▓αÑç αñ¬αñ╣αÑüαñéαñÜαÑçαñéαÑñ ≡ƒÖÅ`,
+      `🎉 *अपॉइंटमेंट सफलतापूर्वक बुक हो गया!*\n\n🎟️ टोकन नंबर: *${token}*\n📅 तारीख: *${date}*\n🕐 समय: *${slot}*\n👨‍⚕️ डॉक्टर: *${DOCTOR_NAME}*\n\nकृपया अपॉइंटमेंट से कुछ मिनट पहले पहुंचें। 🙏`,
 
     appointmentCancelled:
-      "Γ¥î αñåαñ¬αñòαñ╛ αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñòαÑêαñéαñ╕αñ▓ αñòαñ░ αñªαñ┐αñ»αñ╛ αñùαñ»αñ╛ αñ╣αÑêαÑñ\n\nαñåαñ¬ αñ«αÑüαñûαÑìαñ» αñ«αÑçαñ¿αÑé αñ╕αÑç αñªαÑïαñ¼αñ╛αñ░αñ╛ αñ╢αÑüαñ░αÑé αñòαñ░ αñ╕αñòαññαÑç αñ╣αÑêαñéαÑñ",
+      "❌ आपका अपॉइंटमेंट कैंसल कर दिया गया है।\n\nआप मुख्य मेनू से दोबारा शुरू कर सकते हैं।",
 
     doctorTiming:
-      `≡ƒæ¿ΓÇìΓÜò∩╕Å *${DOCTOR_NAME} - αñíαÑëαñòαÑìαñƒαñ░ αñòαñ╛ αñ╕αñ«αñ»*\n\nαñ╕αÑïαñ«αñ╡αñ╛αñ░ - αñ╢αñ¿αñ┐αñ╡αñ╛αñ░\n≡ƒòÖ αñ╕αÑüαñ¼αñ╣ 10:00 - αñªαÑïαñ¬αñ╣αñ░ 1:00\n≡ƒòö αñ╢αñ╛αñ« 5:00 - αñ░αñ╛αññ 8:00\n\nαñ░αñ╡αñ┐αñ╡αñ╛αñ░: αñ¼αñéαñª`,
+      `👨‍⚕️ *${DOCTOR_NAME} - डॉक्टर का समय*\n\nसोमवार - शनिवार\n🕙 सुबह 10:00 - दोपहर 1:00\n🕔 शाम 5:00 - रात 8:00\n\nरविवार: बंद`,
 
     emergency:
-      "≡ƒÜ¿ *αñçαñ«αñ░αñ£αÑçαñéαñ╕αÑÇ αñ╕αñ╣αñ╛αñ»αññαñ╛*\n\nαñàαñùαñ░ αñ»αñ╣ αñ£αñ╛αñ¿αñ▓αÑçαñ╡αñ╛ αñ«αÑçαñíαñ┐αñòαñ▓ αñçαñ«αñ░αñ£αÑçαñéαñ╕αÑÇ αñ╣αÑê, αññαÑï αññαÑüαñ░αñéαññ αñ¿αñ£αñªαÑÇαñòαÑÇ αñàαñ╕αÑìαñ¬αññαñ╛αñ▓ αñ»αñ╛ αñçαñ«αñ░αñ£αÑçαñéαñ╕αÑÇ αñ╕αÑçαñ╡αñ╛ αñ╕αÑç αñ╕αñéαñ¬αñ░αÑìαñò αñòαñ░αÑçαñéαÑñ\n\nWhatsApp αñ£αñ╡αñ╛αñ¼ αñòαñ╛ αñçαñéαññαñ£αñ╛αñ░ αñ¿ αñòαñ░αÑçαñéαÑñ",
+      "🚨 *इमरजेंसी सहायता*\n\nअगर यह जानलेवा मेडिकल इमरजेंसी है, तो तुरंत नजदीकी अस्पताल या इमरजेंसी सेवा से संपर्क करें।\n\nWhatsApp जवाब का इंतजार न करें।",
 
     emergencyRecorded:
-      "≡ƒÜ¿ αñåαñ¬αñòαÑÇ αñçαñ«αñ░αñ£αÑçαñéαñ╕αÑÇ αñ░αñ┐αñòαÑìαñ╡αÑçαñ╕αÑìαñƒ αñ░αñ┐αñòαÑëαñ░αÑìαñí αñòαñ░ αñ▓αÑÇ αñùαñê αñ╣αÑêαÑñ\n\nαñòαÑâαñ¬αñ»αñ╛ αññαÑüαñ░αñéαññ αñ¿αñ£αñªαÑÇαñòαÑÇ αñçαñ«αñ░αñ£αÑçαñéαñ╕αÑÇ αñ«αÑçαñíαñ┐αñòαñ▓ αñ╕αÑçαñ╡αñ╛ αñ╕αÑç αñ╕αñéαñ¬αñ░αÑìαñò αñòαñ░αÑçαñéαÑñ αñ╣αñ«αñ╛αñ░αÑÇ αñƒαÑÇαñ« αñåαñ¬αñòαÑÇ αñ░αñ┐αñòαÑìαñ╡αÑçαñ╕αÑìαñƒ αñ£αñ▓αÑìαñª αñ╕αÑç αñ£αñ▓αÑìαñª αñªαÑçαñûαÑçαñùαÑÇαÑñ",
+      "🚨 आपकी इमरजेंसी रिक्वेस्ट रिकॉर्ड कर ली गई है।\n\nकृपया तुरंत नजदीकी इमरजेंसी मेडिकल सेवा से संपर्क करें। हमारी टीम आपकी रिक्वेस्ट जल्द से जल्द देखेगी।",
 
     noToken:
-      "≡ƒÄƒ∩╕Å αñåαñ£ αñòαÑç αñ▓αñ┐αñÅ αñåαñ¬αñòαñ╛ αñòαÑïαñê αñÅαñòαÑìαñƒαñ┐αñ╡ αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ/αñƒαÑïαñòαñ¿ αñ¿αñ╣αÑÇαñé αñ╣αÑêαÑñ\n\nαñòαÑìαñ»αñ╛ αñåαñ¬ αñàαñ¬αÑëαñçαñéαñƒαñ«αÑçαñéαñƒ αñ¼αÑüαñò αñòαñ░αñ¿αñ╛ αñÜαñ╛αñ╣αññαÑç αñ╣αÑêαñé?",
+      "🎟️ आज के लिए आपका कोई एक्टिव अपॉइंटमेंट/टोकन नहीं है।\n\nक्या आप अपॉइंटमेंट बुक करना चाहते हैं?",
 
     tokenStatus: (token, date, slot, position) =>
-      `≡ƒÄƒ∩╕Å *αñåαñ¬αñòαñ╛ αñƒαÑïαñòαñ¿: ${token}*\n\n≡ƒôà αññαñ╛αñ░αÑÇαñû: ${date}\n≡ƒòÉ αñ╕αñ«αñ»: ${slot}\n≡ƒæÑ αñåαñ¬αñ╕αÑç αñåαñùαÑç αñ«αñ░αÑÇαñ£: ${position}`,
+      `🎟️ *आपका टोकन: ${token}*\n\n📅 तारीख: ${date}\n🕐 समय: ${slot}\n👥 आपसे आगे मरीज: ${position}`,
 
     myDetails: (name, phone, lang) =>
-      `≡ƒæñ *αñåαñ¬αñòαÑÇ αñ£αñ╛αñ¿αñòαñ╛αñ░αÑÇ*\n\nαñ¿αñ╛αñ«: ${name}\nαñ½αÑïαñ¿: ${phone}\nαñ¡αñ╛αñ╖αñ╛: ${lang === "hi" ? "αñ╣αñ┐αñéαñªαÑÇ" : "English"}`,
+      `👤 *आपकी जानकारी*\n\nनाम: ${name}\nफोन: ${phone}\nभाषा: ${lang === "hi" ? "हिंदी" : "English"}`,
 
     languageChanged:
-      "≡ƒîÉ αñ¡αñ╛αñ╖αñ╛ αñ╕αñ½αñ▓αññαñ╛αñ¬αÑéαñ░αÑìαñ╡αñò αñ¼αñªαñ▓ αñªαÑÇ αñùαñê αñ╣αÑêαÑñ",
+      "🌐 भाषा सफलतापूर्वक बदल दी गई है।",
 
     invalidInput:
-      "ΓÜá∩╕Å αñ«αñ╛αñ½ αñòαÑÇαñ£αñ┐αñÅ, αñ«αÑêαñé αñçαñ╕αÑç αñ╕αñ«αñ¥ αñ¿αñ╣αÑÇαñé αñ¬αñ╛αñ»αñ╛αÑñ\n\nαñòαÑâαñ¬αñ»αñ╛ αñëαñ¬αñ▓αñ¼αÑìαñº αñ╡αñ┐αñòαñ▓αÑìαñ¬αÑïαñé αñ«αÑçαñé αñ╕αÑç αñÜαÑüαñ¿αÑçαñéαÑñ",
+      "⚠️ माफ कीजिए, मैं इसे समझ नहीं पाया।\n\nकृपया उपलब्ध विकल्पों में से चुनें।",
 
     back:
-      "Γ¼à∩╕Å αñ╡αñ╛αñ¬αñ╕",
+      "⬅️ वापस",
 
     yes:
-      "αñ╣αñ╛αñü",
+      "हाँ",
 
     no:
-      "αñ¿αñ╣αÑÇαñé"
+      "नहीं"
   }
 
 };
@@ -291,7 +291,7 @@ async function initDB() {
   `);
 
 
-  console.log("Γ£à Database schema verified/created successfully.");
+  console.log("✅ Database schema verified/created successfully.");
 }
 
 
@@ -400,14 +400,14 @@ async function sendWhatsApp(payload) {
       }
     );
     console.log(
-  "Γ£à WhatsApp API Response:",
+  "✅ WhatsApp API Response:",
   response.data
 );
 
   } catch (error) {
 
     console.error(
-      "Γ¥î WhatsApp API Error:",
+      "❌ WhatsApp API Error:",
       error.response?.data || error.message
     );
 
@@ -478,7 +478,7 @@ async function sendButtons(to, body, buttons) {
 
  async function sendList(to, body, buttonText, sections) {
 
-  console.log("≡ƒÜ¿ SENDLIST RECEIVED:", JSON.stringify({
+  console.log("🚨 SENDLIST RECEIVED:", JSON.stringify({
   to,
   body,
   buttonText,
@@ -530,12 +530,12 @@ async function sendButtons(to, body, buttons) {
   };
 
   console.log(
-    "≡ƒôñ LIST ROW COUNT:",
+    "📤 LIST ROW COUNT:",
     payload.interactive.action.sections[0].rows.length
   );
 
   console.log(
-    "≡ƒôñ LIST ROWS:",
+    "📤 LIST ROWS:",
     payload.interactive.action.sections[0].rows
   );
 
@@ -551,16 +551,16 @@ async function sendLanguageMenu(to) {
   await sendButtons(
     to,
 
-    `≡ƒîÉ Select Language / αñ¡αñ╛αñ╖αñ╛ αñÜαÑüαñ¿αÑçαñé`,
+    `🌐 Select Language / भाषा चुनें`,
 
     [
       {
         id: "LANG_EN",
-        title: "≡ƒç¼≡ƒçº English"
+        title: "🇬🇧 English"
       },
       {
         id: "LANG_HI",
-        title: "≡ƒç«≡ƒç│ αñ╣αñ┐αñéαñªαÑÇ"
+        title: "🇮🇳 हिंदी"
       }
     ]
   );
@@ -671,9 +671,9 @@ async function sendDateMenu(to, lang) {
 
     const label =
       i === 0
-        ? (lang === "hi" ? "αñåαñ£" : "Today")
+        ? (lang === "hi" ? "आज" : "Today")
         : i === 1
-          ? (lang === "hi" ? "αñòαñ▓" : "Tomorrow")
+          ? (lang === "hi" ? "कल" : "Tomorrow")
           : formatDate(value);
 
     rows.push({
@@ -690,7 +690,7 @@ async function sendDateMenu(to, lang) {
     t.chooseDateButton,
     [
       {
-        title: lang === "hi" ? "αñëαñ¬αñ▓αñ¼αÑìαñº αññαñ╛αñ░αÑÇαñûαÑçαñé" : "Available Dates",
+        title: lang === "hi" ? "उपलब्ध तारीखें" : "Available Dates",
         rows
       }
     ]
@@ -769,7 +769,7 @@ async function sendSlotMenu(to, date, lang) {
   await sendList(
     to,
 
-    `${t.chooseSlot}\n\n≡ƒôà ${formatDate(date)}`,
+    `${t.chooseSlot}\n\n📅 ${formatDate(date)}`,
 
     "Select Slot",
 
@@ -834,7 +834,7 @@ app.get("/webhook", (req, res) => {
     token === VERIFY_TOKEN
   ) {
 
-    console.log("Γ£à WhatsApp webhook verified.");
+    console.log("✅ WhatsApp webhook verified.");
 
     return res.status(200).send(challenge);
   }
@@ -935,7 +935,7 @@ function isValidName(name) {
 
   return (
     cleaned.length >= 2 &&
-    /^[A-Za-z├Ç-├┐\u0900-\u097F\s.'-]+$/.test(cleaned)
+    /^[A-Za-zÀ-ÿ\u0900-\u097F\s.'-]+$/.test(cleaned)
   );
 }
 
@@ -1139,20 +1139,20 @@ async function handleEmergency(phone, lang) {
   await sendText(
     phone,
     lang === "hi"
-      ? "≡ƒÜ¿ αñòαÑìαñ»αñ╛ αñåαñ¬ Emergency Booking αñòαñ░αñ¿αñ╛ αñÜαñ╛αñ╣αññαÑç αñ╣αÑêαñé?"
-      : "≡ƒÜ¿ Do you want to make an Emergency Booking?"
+      ? "🚨 क्या आप Emergency Booking करना चाहते हैं?"
+      : "🚨 Do you want to make an Emergency Booking?"
   );
-console.log("≡ƒÜ¿ EMERGENCY SENDLIST DATA:", JSON.stringify([
+console.log("🚨 EMERGENCY SENDLIST DATA:", JSON.stringify([
   {
     title: "SmartClinic",
     rows: [
       {
         id: "EMERGENCY_YES",
-        title: lang === "hi" ? "αñ╣αñ╛αñü" : "YES"
+        title: lang === "hi" ? "हाँ" : "YES"
       },
       {
         id: "EMERGENCY_NO",
-        title: lang === "hi" ? "αñ¿αñ╣αÑÇαñé" : "NO"
+        title: lang === "hi" ? "नहीं" : "NO"
       }
     ]
   }
@@ -1160,19 +1160,19 @@ console.log("≡ƒÜ¿ EMERGENCY SENDLIST DATA:", JSON.stringify([
 
   await sendList(
     phone,
-    lang === "hi" ? "αñ╡αñ┐αñòαñ▓αÑìαñ¬ αñÜαÑüαñ¿αÑçαñé" : "Choose an option",
-    lang === "hi" ? "αñÜαÑüαñ¿αÑçαñé" : "Select",
+    lang === "hi" ? "विकल्प चुनें" : "Choose an option",
+    lang === "hi" ? "चुनें" : "Select",
     [
       {
         title: "SmartClinic",
         rows: [
           {
             id: "EMERGENCY_YES",
-            title: lang === "hi" ? "αñ╣αñ╛αñü" : "YES"
+            title: lang === "hi" ? "हाँ" : "YES"
           },
           {
             id: "EMERGENCY_NO",
-            title: lang === "hi" ? "αñ¿αñ╣αÑÇαñé" : "NO"
+            title: lang === "hi" ? "नहीं" : "NO"
           }
         ]
       }
@@ -1325,7 +1325,7 @@ async function handleTokenStatus(
   );
 }
 /* =========================================================
-   PART 2B ΓÇö APPOINTMENT + TOKEN FLOW
+   PART 2B — APPOINTMENT + TOKEN FLOW
 ========================================================= */
 
 /* =========================================================
@@ -1708,7 +1708,7 @@ async function handleMenuAction(
     await sendText(
         phone,
         lang === "hi"
-            ? " αñòαÑâαñ¬αñ»αñ╛ αñ«αñ░αÑÇαñ£ αñòαñ╛ *αñ¬αÑéαñ░αñ╛ αñ¿αñ╛αñ«* αñ¡αÑçαñ£αÑçαñéαÑñ"
+            ? " कृपया मरीज का *पूरा नाम* भेजें।"
             : " Please send the patient's *full name*."
     );
 
@@ -1799,7 +1799,7 @@ async function processMessage(message) {
   const text = message.text || "";
 
   console.log(
-    `≡ƒô⌐ Message received from ${phone}:`,
+    `📩 Message received from ${phone}:`,
     id || text
   );
 
@@ -1821,8 +1821,8 @@ if (session.state === "EMERGENCY_NAME") {
     await sendText(
       phone,
       session?.temp_data?.language === "hi"
-        ? "ΓÜá∩╕Å αñòαÑâαñ¬αñ»αñ╛ αñ«αñ░αÑÇαñ£ αñòαñ╛ αñ╕αñ╣αÑÇ αñ¬αÑéαñ░αñ╛ αñ¿αñ╛αñ« αñ¡αÑçαñ£αÑçαñéαÑñ"
-        : "ΓÜá∩╕Å Please enter the patient's full name."
+        ? "⚠️ कृपया मरीज का सही पूरा नाम भेजें।"
+        : "⚠️ Please enter the patient's full name."
     );
 
     return;
@@ -1840,8 +1840,8 @@ if (session.state === "EMERGENCY_NAME") {
   await sendText(
     phone,
     session?.temp_data?.language === "hi"
-      ? "≡ƒô▒ αñòαÑâαñ¬αñ»αñ╛ αñ«αñ░αÑÇαñ£ αñòαñ╛ *10-digit phone number* αñ¡αÑçαñ£αÑçαñéαÑñ"
-      : "≡ƒô▒ Please send the patient's *10-digit phone number*."
+      ? "📱 कृपया मरीज का *10-digit phone number* भेजें।"
+      : "📱 Please send the patient's *10-digit phone number*."
   );
 
   return;
@@ -1857,8 +1857,8 @@ if (session.state === "EMERGENCY_PHONE") {
     await sendText(
       phone,
       session?.temp_data?.language === "hi"
-        ? "ΓÜá∩╕Å αñòαÑâαñ¬αñ»αñ╛ αñ«αñ░αÑÇαñ£ αñòαñ╛ αñ╕αñ╣αÑÇ *10 αñàαñéαñòαÑïαñé αñòαñ╛ αñ«αÑïαñ¼αñ╛αñçαñ▓ αñ¿αñéαñ¼αñ░* αñ¡αÑçαñ£αÑçαñéαÑñ"
-        : "ΓÜá∩╕Å Please send a valid *10-digit phone number*."
+        ? "⚠️ कृपया मरीज का सही *10 अंकों का मोबाइल नंबर* भेजें।"
+        : "⚠️ Please send a valid *10-digit phone number*."
     );
 
     return;
@@ -1876,8 +1876,8 @@ if (session.state === "EMERGENCY_PHONE") {
   await sendText(
     phone,
     session?.temp_data?.language === "hi"
-      ? "≡ƒÜ¿ αñòαÑâαñ¬αñ»αñ╛ Emergency αñòαÑÇ αñ£αñ╛αñ¿αñòαñ╛αñ░αÑÇ αñ¡αÑçαñ£αÑçαñéαÑñ\n\nαñ»αñ╣ αñ£αñ╛αñ¿αñòαñ╛αñ░αÑÇ *αñ╡αÑêαñòαñ▓αÑìαñ¬αñ┐αñò* αñ╣αÑêαÑñ\n\nαñàαñùαñ░ αñ£αñ╛αñ¿αñòαñ╛αñ░αÑÇ αñ¿αñ╣αÑÇαñé αñªαÑçαñ¿αñ╛ αñÜαñ╛αñ╣αññαÑç αñ╣αÑêαñé αññαÑï *skip* αñ▓αñ┐αñûαÑçαñéαÑñ"
-      : "≡ƒÜ¿ Please provide the emergency details.\n\nThis information is *optional*.\n\nIf you don't want to provide details, type *skip*."
+      ? "🚨 कृपया Emergency की जानकारी भेजें।\n\nयह जानकारी *वैकल्पिक* है।\n\nअगर जानकारी नहीं देना चाहते हैं तो *skip* लिखें।"
+      : "🚨 Please provide the emergency details.\n\nThis information is *optional*.\n\nIf you don't want to provide details, type *skip*."
   );
 
   return;
@@ -1898,8 +1898,8 @@ if (session.state === "EMERGENCY_DETAILS") {
   await sendText(
     phone,
     session?.temp_data?.language === "hi"
-      ? `Γ£à *αñåαñ¬αñòαÑÇ Emergency Booking αñ╕αñ½αñ▓αññαñ╛αñ¬αÑéαñ░αÑìαñ╡αñò αñ¬αÑéαñ░αÑÇ αñ╣αÑï αñùαñê αñ╣αÑêαÑñ*\n\n≡ƒæñ αñ«αñ░αÑÇαñ£ αñòαñ╛ αñ¿αñ╛αñ«: ${patientName}\n≡ƒô₧ αñ«αÑïαñ¼αñ╛αñçαñ▓ αñ¿αñéαñ¼αñ░: ${patientPhone}\n≡ƒÜ¿ Emergency Details: ${emergencyDetails || "αñ¬αÑìαñ░αñªαñ╛αñ¿ αñ¿αñ╣αÑÇαñé αñòαÑÇ αñùαñê"}\n\n≡ƒÅÑ αñåαñ¬αñòαñ╛ Emergency αñàαñ¿αÑüαñ░αÑïαñº αñªαñ░αÑìαñ£ αñ╣αÑï αñùαñ»αñ╛ αñ╣αÑêαÑñ`
-      : `Γ£à *Your Emergency Booking has been completed successfully.*\n\n≡ƒæñ Patient Name: ${patientName}\n≡ƒô₧ Phone Number: ${patientPhone}\n≡ƒÜ¿ Emergency Details: ${emergencyDetails || "Not provided"}\n\n≡ƒÅÑ Your emergency request has been recorded.`
+      ? `✅ *आपकी Emergency Booking सफलतापूर्वक पूरी हो गई है।*\n\n👤 मरीज का नाम: ${patientName}\n📞 मोबाइल नंबर: ${patientPhone}\n🚨 Emergency Details: ${emergencyDetails || "प्रदान नहीं की गई"}\n\n🏥 आपका Emergency अनुरोध दर्ज हो गया है।`
+      : `✅ *Your Emergency Booking has been completed successfully.*\n\n👤 Patient Name: ${patientName}\n📞 Phone Number: ${patientPhone}\n🚨 Emergency Details: ${emergencyDetails || "Not provided"}\n\n🏥 Your emergency request has been recorded.`
   );
 
   await setSession(phone, "MAIN_MENU", {});
@@ -1996,7 +1996,7 @@ if (session.state === "EMERGENCY_DETAILS") {
       if (
         lower === "hindi" ||
         lower === "hi" ||
-        lower.includes("αñ╣αñ┐αñéαñªαÑÇ")
+        lower.includes("हिंदी")
       ) {
 
         await handleLanguageSelection(
@@ -2125,7 +2125,7 @@ if (session.state === "EMERGENCY_DETAILS") {
     if (
       lower === "hindi" ||
       lower === "hi" ||
-      lower.includes("αñ╣αñ┐αñéαñªαÑÇ")
+      lower.includes("हिंदी")
     ) {
 
       await handleLanguageSelection(
@@ -2219,7 +2219,7 @@ if (session.state === "EMERGENCY_DETAILS") {
     } catch (error) {
 
       console.error(
-        "Γ¥î SLOT DECODE ERROR:",
+        "❌ SLOT DECODE ERROR:",
         error
       );
 
@@ -2228,7 +2228,7 @@ if (session.state === "EMERGENCY_DETAILS") {
 
     if (!slot) {
       console.error(
-        "Γ¥î SLOT VALUE EMPTY:",
+        "❌ SLOT VALUE EMPTY:",
         id
       );
 
@@ -2247,7 +2247,7 @@ if (session.state === "EMERGENCY_DETAILS") {
     }
 
     console.log(
-      "Γ£à SELECTED SLOT:",
+      "✅ SELECTED SLOT:",
       slot
     );
 
@@ -2312,7 +2312,7 @@ if (session.state === "EMERGENCY_DETAILS") {
     if (
       lower === "yes" ||
       lower === "ha" ||
-      lower === "αñ╣αñ╛αñü"
+      lower === "हाँ"
     ) {
 
       await confirmAppointment(
@@ -2327,7 +2327,7 @@ if (session.state === "EMERGENCY_DETAILS") {
     if (
       lower === "no" ||
       lower === "nahi" ||
-      lower === "αñ¿αñ╣αÑÇαñé"
+      lower === "नहीं"
     ) {
 
       await cancelAppointment(
@@ -2392,7 +2392,7 @@ if (session.state === "EMERGENCY_DETAILS") {
     if (
       lower === "menu" ||
       lower === "main menu" ||
-      lower === "αñ«αÑüαñûαÑìαñ» αñ«αÑçαñ¿αÑé"
+      lower === "मुख्य मेनू"
     ) {
 
       await sendMainMenu(
@@ -2465,7 +2465,7 @@ app.post(
     } catch (error) {
 
       console.error(
-        "Γ¥î Message processing error:",
+        "❌ Message processing error:",
         error.response?.data ||
         error.message ||
         error
@@ -2522,21 +2522,21 @@ async function startServer() {
       () => {
 
         console.log(
-          `≡ƒÅÑ ${CLINIC_NAME} WhatsApp bot running on port ${PORT}`
+          `🏥 ${CLINIC_NAME} WhatsApp bot running on port ${PORT}`
         );
 
         console.log(
-          `≡ƒîÉ Webhook: http://localhost:${PORT}/webhook`
+          `🌐 Webhook: http://localhost:${PORT}/webhook`
         );
 
         console.log(
-          `Γ¥ñ∩╕Å Health: http://localhost:${PORT}/health`
+          `❤️ Health: http://localhost:${PORT}/health`
         );
       }
     );
 
   } catch (error) {
-console.error("Γ¥î FAILED TO START SERVER");
+console.error("❌ FAILED TO START SERVER");
 console.error(error);
 console.error(error?.stack);
 
